@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>方案二：赛博极光风 — Mood Board</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ——— 赛博极光风 Design Tokens ——— */
+    :root {
+      --bg-main: #0E0E14;
+      --bg-card: #1A1A2E;
+      --bg-surface: #16213E;
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --color-purple: #A855F7;
+      --color-cyan: #06B6D4;
+      --color-green: #10B981;
+      --color-border: rgba(168, 85, 247, 0.2);
+      --color-glow: rgba(168, 85, 247, 0.25);
+      --grad-accent: linear-gradient(135deg, #A855F7, #06B6D4);
+    }
+    /* 浅色模式覆盖 */
+    html:not(.dark) {
+      --bg-main: #F1F5F9;
+      --bg-card: #FFFFFF;
+      --bg-surface: #F8FAFC;
+      --text-primary: #1E293B;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --color-purple: #7C3AED;
+      --color-cyan: #0891B2;
+      --color-green: #059669;
+      --color-border: rgba(124, 58, 237, 0.2);
+      --color-glow: rgba(124, 58, 237, 0.12);
+    }
+    html { background: var(--bg-main); }
+    body {
+      background: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* 导航——深色适配 */
+    .preview-nav {
+      background: rgba(14,14,20,0.92) !important;
+      border-bottom: 1px solid var(--color-border);
+    }
+    html:not(.dark) .preview-nav {
+      background: rgba(241,245,249,0.92) !important;
+    }
+    .preview-nav .nav-brand { color: var(--text-secondary); }
+    .preview-nav .nav-links a { color: var(--text-muted); }
+    .preview-nav .nav-links a:hover,
+    .preview-nav .nav-links a.active {
+      background: var(--grad-accent);
+      color: #fff;
+      border-radius: 20px;
+    }
+
+    /* ——— 背景网格装饰 ——— */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(168,85,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(168,85,247,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    html:not(.dark) body::before { opacity: 0; }
+
+    .moodboard-container { position: relative; z-index: 1; }
+
+    /* ——— Mood Board 主体 ——— */
+    .mb-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 24px 80px;
+    }
+
+    /* 渐变文字 */
+    .grad-text {
+      background: var(--grad-accent);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* 标题区域 */
+    .mb-hero {
+      padding-bottom: 48px;
+      margin-bottom: 56px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .mb-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .mb-headline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .mb-subline {
+      font-size: 15px;
+      line-height: 1.85;
+      color: var(--text-secondary);
+      max-width: 480px;
+    }
+
+    /* 光标闪烁 */
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .cursor {
+      display: inline-block;
+      width: 3px; height: 1em;
+      background: var(--color-cyan);
+      margin-left: 4px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    /* 区块标题 */
+    .section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: '//';
+      color: var(--color-purple);
+      opacity: 0.7;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* 色板 */
+    .swatch-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .swatch-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .swatch-box {
+      width: 72px; height: 72px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+    }
+    .swatch-info {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .swatch-info strong { display: block; color: var(--text-secondary); font-size: 11px; }
+
+    /* 渐变色板 */
+    .grad-swatch {
+      width: 72px; height: 72px;
+      border-radius: 8px;
+      background: var(--grad-accent);
+    }
+
+    /* 氛围色条 */
+    .vibe-strip {
+      height: 56px;
+      border-radius: 8px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 56px;
+      border: 1px solid var(--color-border);
+    }
+    .vibe-strip div { flex: 1; }
+
+    /* 字体展示 */
+    .type-demo { margin-bottom: 56px; }
+    .type-row {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .type-heading {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .type-body {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.85;
+    }
+    .type-caption {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .type-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    /* 文章卡片 */
+    .comp-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+
+    .article-card {
+      flex: 1; min-width: 260px;
+      background: var(--bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .article-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad-accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .article-card:hover {
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 24px var(--color-glow);
+      transform: translateY(-3px);
+    }
+    .article-card:hover::before { transform: scaleX(1); }
+
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--color-purple);
+      color: var(--color-purple);
+      margin-bottom: 14px;
+      background: rgba(168,85,247,0.08);
+    }
+    html:not(.dark) .card-tag { border-color: var(--color-purple); color: var(--color-purple); background: rgba(124,58,237,0.06); }
+
+    .card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .card-excerpt {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .card-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .card-link {
+      font-size: 12px;
+      color: var(--color-cyan);
+      cursor: pointer;
+    }
+
+    /* 代码块 */
+    .code-block {
+      background: var(--bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .code-body {
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .code-keyword { color: var(--color-purple); }
+    .code-fn { color: var(--color-cyan); }
+    .code-str { color: var(--color-green); }
+    .code-comment { color: var(--text-muted); }
+
+    /* 按钮 */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--grad-accent);
+      color: #fff;
+      font-size: 13px; font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px; border: none; cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 24px var(--color-glow); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--color-purple);
+      font-size: 13px; font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--color-purple);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      transition: background 0.2s;
+    }
+    .btn-ghost:hover { background: rgba(168,85,247,0.1); }
+  </style>
+</head>
+<body class="dark">
+  <nav class="preview-nav">
+    <a href="index.html" class="nav-brand">← 返回总览</a>
+    <ul class="nav-links">
+      <li><a href="style-1.html">方案一</a></li>
+      <li><a href="style-2.html" class="active">方案二</a></li>
+      <li><a href="style-3.html">方案三</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="切换主题"></button>
+  </nav>
+
+  <div class="moodboard-container">
+    <div class="mb-wrap">
+
+      <!-- Hero -->
+      <div class="mb-hero animate-fade-up">
+        <span class="mb-tag grad-text">方案二 · Mood Board</span>
+        <h1 class="mb-headline">
+          <span class="grad-text">&lt;Cyber</span><br>
+          <span style="color:var(--text-primary);">Aurora</span>
+          <span class="cursor"></span>
+        </h1>
+        <p class="mb-subline">暗色宇宙中的代码诗人美学。把博客本身变成一个精心设计的 IDE 主题——黑客审美与知识深度的完美融合。</p>
+      </div>
+
+      <!-- 色彩体系 -->
+      <div class="animate-fade-up">
+        <div class="section-title">色彩体系 · 60-30-10</div>
+        <div class="swatch-group">
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#0E0E14;"></div>
+            <div class="swatch-info"><strong>60% 深蓝黑</strong>#0E0E14<br>主背景</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#1A1A2E;"></div>
+            <div class="swatch-info"><strong>30% 深蓝紫</strong>#1A1A2E<br>卡片背景</div>
+          </div>
+          <div class="swatch-item">
+            <div class="grad-swatch"></div>
+            <div class="swatch-info"><strong>10% 紫→青渐变</strong>#A855F7→#06B6D4<br>强调色</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#E2E8F0;"></div>
+            <div class="swatch-info"><strong>主文字</strong>#E2E8F0<br>冷白</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#10B981;"></div>
+            <div class="swatch-info"><strong>代码绿</strong>#10B981<br>终端绿</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#94A3B8;"></div>
+            <div class="swatch-info"><strong>辅助文字</strong>#94A3B8<br>蓝灰</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 氛围色条 -->
+      <div class="vibe-strip animate-fade-up">
+        <div style="background:#0E0E14;"></div>
+        <div style="background:#16213E;"></div>
+        <div style="background:#1A1A2E;"></div>
+        <div style="background:#64748B;"></div>
+        <div style="background:#A855F7;"></div>
+        <div style="background:linear-gradient(135deg,#A855F7,#06B6D4);"></div>
+        <div style="background:#06B6D4;"></div>
+        <div style="background:#10B981;"></div>
+      </div>
+
+      <!-- 字体展示 -->
+      <div class="type-demo animate-fade-up">
+        <div class="section-title">字体系统</div>
+        <div class="type-row">
+          <div class="type-heading"><span class="grad-text">function</span> buildBlog<span style="color:var(--color-cyan);">()</span> <span style="color:var(--text-muted)">{</span></div>
+          <div class="type-meta">JetBrains Mono · 800 ExtraBold · 32px · 标题层级</div>
+        </div>
+        <div class="type-row">
+          <div class="type-body">深入理解 Node.js 的异步机制，从 libuv 到 V8，拆解 JavaScript 单线程背后真正的非阻塞 I/O 模型。掌握这些，才算真正理解 Node.js 的设计哲学。</div>
+          <div class="type-meta">思源黑体 · 300 Light · 15px · 正文层级</div>
+        </div>
+        <div class="type-row">
+          <div class="type-caption">2026-04-06 · NODE.JS · BACKEND · 8 MIN READ</div>
+          <div class="type-meta">JetBrains Mono · 400 · 11px · 辅助信息 (全大写+字间距)</div>
+        </div>
+      </div>
+
+      <!-- 代码块组件 -->
+      <div class="animate-fade-up">
+        <div class="section-title">代码块（技术博客核心组件）</div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dot" style="background:#F87171;"></div>
+            <div class="code-dot" style="background:#FBBF24;"></div>
+            <div class="code-dot" style="background:#34D399;"></div>
+            <span style="margin-left:8px; font-size:11px; color:var(--text-muted);">event-loop.js</span>
+          </div>
+          <div class="code-body">
+            <span class="code-comment">// Node.js 事件循环示例</span><br>
+            <span class="code-keyword">const</span> <span class="code-fn">EventEmitter</span> = require(<span class="code-str">'events'</span>);<br>
+            <span class="code-keyword">async function</span> <span class="code-fn">main</span>() {<br>
+            &nbsp;&nbsp;<span class="code-keyword">await</span> <span class="code-fn">processTasks</span>();<br>
+            &nbsp;&nbsp;console.<span class="code-fn">log</span>(<span class="code-str">'✓ 任务完成'</span>);<br>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- 文章卡片 -->
+      <div class="animate-fade-up">
+        <div class="section-title">文章卡片（悬停查看发光效果）</div>
+        <div class="comp-row">
+          <div class="article-card">
+            <div class="card-tag">NODE.JS</div>
+            <div class="card-title">深入理解 Node.js 事件循环</div>
+            <div class="card-excerpt">从 libuv 到 V8，拆解 JavaScript 单线程背后的异步原理...</div>
+            <div class="card-footer">
+              <span class="card-date">2026-04-06</span>
+              <span class="card-link">read →</span>
+            </div>
+          </div>
+          <div class="article-card">
+            <div class="card-tag">MYSQL</div>
+            <div class="card-title">MySQL 索引优化的三个细节</div>
+            <div class="card-excerpt">覆盖索引、最左前缀原则和索引下推，改变性能的关键认知...</div>
+            <div class="card-footer">
+              <span class="card-date">2026-03-28</span>
+              <span class="card-link">read →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 按钮 -->
+      <div class="animate-fade-up">
+        <div class="section-title">交互元素</div>
+        <div class="comp-row" style="align-items:center;">
+          <button class="btn-primary">发布文章</button>
+          <button class="btn-ghost">查看更多</button>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--color-cyan);">$ git push origin main</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="components.js"></script>
+</body>
+</html>
