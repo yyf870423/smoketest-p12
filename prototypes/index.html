@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客 — 文章列表</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .article-card:nth-child(1) { animation-delay: 0.7s; }
+    .article-card:nth-child(2) { animation-delay: 0.85s; }
+    .article-card:nth-child(3) { animation-delay: 1.0s; }
+    .article-card:nth-child(4) { animation-delay: 1.15s; }
+    .article-card:nth-child(5) { animation-delay: 1.3s; }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-cn">墨迹</span>
+        <span class="logo-en">Blog</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link active">文章</a>
+        <a href="about.html" class="nav-link">关于</a>
+        <a href="admin-login.html" class="nav-link nav-link-subtle">后台</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="ThemeManager.toggle()" title="切换主题">
+          <span class="theme-icon">☾</span>
+        </button>
+        <button class="hamburger" aria-label="菜单">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <!-- 移动端菜单 -->
+    <nav class="mobile-menu">
+      <a href="index.html" class="mobile-nav-link active">文章</a>
+      <a href="about.html" class="mobile-nav-link">关于</a>
+      <a href="admin-login.html" class="mobile-nav-link">后台</a>
+    </nav>
+  </header>
+
+  <main class="page-container" style="padding-top: calc(var(--layout-header) + var(--space-6));">
+
+    <!-- 英雄区 -->
+    <section class="hero">
+      <div class="hero-eyebrow">// Personal Blog</div>
+      <h1 class="hero-title">记录思考<br>与代码之间</h1>
+      <p class="hero-subtitle">分享技术文章、设计思考与生活感悟。每一篇文字都是对某个瞬间最诚实的记录。</p>
+      <div class="hero-ink-line"></div>
+    </section>
+
+    <!-- 筛选标签 -->
+    <div class="filter-bar">
+      <span class="filter-label">分类</span>
+      <button class="tag-btn active" onclick="filterArticles(this, 'all')">全部</button>
+      <button class="tag-btn" onclick="filterArticles(this, 'tech')">技术</button>
+      <button class="tag-btn" onclick="filterArticles(this, 'design')">设计</button>
+      <button class="tag-btn" onclick="filterArticles(this, 'life')">生活</button>
+      <button class="tag-btn" onclick="filterArticles(this, 'reading')">读书</button>
+    </div>
+
+    <!-- 主内容 + 侧边栏 -->
+    <div class="articles-layout">
+
+      <!-- 文章列表 -->
+      <section class="article-list">
+
+        <!-- 精选文章 -->
+        <article class="article-card featured-card" onclick="location.href='article.html'">
+          <span class="featured-badge">精选</span>
+          <div class="article-meta">
+            <span class="article-tag">技术</span>
+            <span class="article-meta-sep"></span>
+            <span class="article-date">2025-12-20</span>
+          </div>
+          <h2 class="article-title">从零构建个人博客系统：Node.js + EJS 实践全记录</h2>
+          <p class="article-excerpt">历时三周，我用 Node.js、Express 和 EJS 从零搭建了这个博客系统。这篇文章记录了技术选型的思考、踩过的坑，以及最终让我满意的架构设计——不追求花哨，只求可维护。</p>
+          <div class="article-footer">
+            <span class="read-time">📖 12 分钟阅读</span>
+            <a href="article.html" class="read-link">阅读全文 →</a>
+          </div>
+        </article>
+
+        <!-- 普通文章 -->
+        <article class="article-card" onclick="location.href='article.html'">
+          <div class="article-meta">
+            <span class="article-tag">设计</span>
+            <span class="article-meta-sep"></span>
+            <span class="article-date">2025-12-10</span>
+          </div>
+          <h2 class="article-title">设计系统的本质：不是组件库，而是决策记录</h2>
+          <p class="article-excerpt">很多团队把设计系统等同于 UI 组件库，但这只是冰山一角。真正的设计系统是团队设计决策的集合——为什么用这个颜色、为什么圆角是 4px 而不是 8px……</p>
+          <div class="article-footer">
+            <span class="read-time">📖 8 分钟阅读</span>
+            <a href="article.html" class="read-link">阅读全文 →</a>
+          </div>
+        </article>
+
+        <article class="article-card" onclick="location.href='article.html'">
+          <div class="article-meta">
+            <span class="article-tag">读书</span>
+            <span class="article-meta-sep"></span>
+            <span class="article-date">2025-11-28</span>
+          </div>
+          <h2 class="article-title">《程序员修炼之道》：20 年后重读，依然字字珠玑</h2>
+          <p class="article-excerpt">第一次读这本书是大学二年级，满眼都是"实用技巧"。十年后再翻，才发现作者真正想说的是一种思维方式——如何成为一个真正在思考的程序员，而不只是代码搬运工。</p>
+          <div class="article-footer">
+            <span class="read-time">📖 6 分钟阅读</span>
+            <a href="article.html" class="read-link">阅读全文 →</a>
+          </div>
+        </article>
+
+        <article class="article-card" onclick="location.href='article.html'">
+          <div class="article-meta">
+            <span class="article-tag">技术</span>
+            <span class="article-meta-sep"></span>
+            <span class="article-date">2025-11-15</span>
+          </div>
+          <h2 class="article-title">MySQL 索引优化：一次让查询从 3s 降到 30ms 的经历</h2>
+          <p class="article-excerpt">生产环境的一个慢查询告警让我花了整个下午排查。最终发现是联合索引的字段顺序问题——这个故事告诉我，EXPLAIN 是每个开发者都应该熟悉的工具。</p>
+          <div class="article-footer">
+            <span class="read-time">📖 9 分钟阅读</span>
+            <a href="article.html" class="read-link">阅读全文 →</a>
+          </div>
+        </article>
+
+        <article class="article-card" onclick="location.href='article.html'">
+          <div class="article-meta">
+            <span class="article-tag">生活</span>
+            <span class="article-meta-sep"></span>
+            <span class="article-date">2025-10-31</span>
+          </div>
+          <h2 class="article-title">2025 年的工具清单：我用什么思考和工作</h2>
+          <p class="article-excerpt">每年整理一次工具清单已经成为习惯。今年变化最大的是 AI 辅助写作和代码工具的比重大幅上升，但有些老工具依然无可替代——比如纸质笔记本。</p>
+          <div class="article-footer">
+            <span class="read-time">📖 5 分钟阅读</span>
+            <a href="article.html" class="read-link">阅读全文 →</a>
+          </div>
+        </article>
+
+        <!-- 分页 -->
+        <nav class="pagination">
+          <a href="#" class="page-btn">‹</a>
+          <a href="#" class="page-btn active">1</a>
+          <a href="#" class="page-btn">2</a>
+          <a href="#" class="page-btn">3</a>
+          <span style="color:var(--color-text-muted);font-family:var(--font-mono);font-size:13px;">…</span>
+          <a href="#" class="page-btn">8</a>
+          <a href="#" class="page-btn">›</a>
+        </nav>
+
+      </section>
+
+      <!-- 侧边栏 -->
+      <aside class="sidebar">
+        <div class="sidebar-block">
+          <div class="sidebar-title">标签</div>
+          <div class="sidebar-tags">
+            <a href="#" class="sidebar-tag">Node.js</a>
+            <a href="#" class="sidebar-tag">MySQL</a>
+            <a href="#" class="sidebar-tag">设计系统</a>
+            <a href="#" class="sidebar-tag">UX</a>
+            <a href="#" class="sidebar-tag">读书笔记</a>
+            <a href="#" class="sidebar-tag">工具</a>
+            <a href="#" class="sidebar-tag">Express</a>
+            <a href="#" class="sidebar-tag">CSS</a>
+          </div>
+        </div>
+        <div class="sidebar-block">
+          <div class="sidebar-title">近期文章</div>
+          <ul class="recent-list">
+            <li class="recent-item">
+              <a href="article.html">从零构建个人博客系统</a>
+              <div class="recent-date">2025-12-20</div>
+            </li>
+            <li class="recent-item">
+              <a href="article.html">设计系统的本质</a>
+              <div class="recent-date">2025-12-10</div>
+            </li>
+            <li class="recent-item">
+              <a href="article.html">程序员修炼之道重读</a>
+              <div class="recent-date">2025-11-28</div>
+            </li>
+            <li class="recent-item">
+              <a href="article.html">MySQL 索引优化实践</a>
+              <div class="recent-date">2025-11-15</div>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-block">
+          <div class="sidebar-title">关于博主</div>
+          <p class="sidebar-about-text">全栈开发者，喜欢设计和写作。记录技术成长，分享生活思考。</p>
+          <a href="about.html" class="sidebar-about-link">了解更多 →</a>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-cn" style="font-size:1.2rem;">墨迹</span>
+        <span class="footer-tagline">个人博客</span>
+      </div>
+      <div class="footer-copy">© 2025 · 以墨记之</div>
+    </div>
+  </footer>
+
+  <script src="components.js"></script>
+  <script>
+    // 筛选文章（原型演示：仅切换样式）
+    function filterArticles(btn, category) {
+      document.querySelectorAll('.filter-bar .tag-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // 真实实现：按 category 过滤文章列表
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      ThemeManager.init();
+      NavManager.init();
+    });
+  </script>
+</body>
+</html>
