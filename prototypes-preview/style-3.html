@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>方案三：温暖编辑风 — Mood Board</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ——— 温暖编辑风 Design Tokens ——— */
+    :root {
+      --bg-main: #FAF7F2;
+      --bg-card: #FFFFFF;
+      --bg-warm: #F5EFE6;
+      --text-ink: #1A1714;
+      --text-body: #2C2926;
+      --text-muted: #7A7167;
+      --color-terra: #C2623D;
+      --color-terra-light: #F2E4DC;
+      --color-terra-dark: #8E3E20;
+      --color-border: #E8E2D9;
+      --color-divider: #D9D1C4;
+      --font-display: 'Playfair Display', 'Noto Serif SC', serif;
+      --font-serif: 'Lora', 'Noto Serif SC', serif;
+      --font-sans: 'Noto Sans SC', 'PingFang SC', sans-serif;
+    }
+    .dark {
+      --bg-main: #1A1714;
+      --bg-card: #242018;
+      --bg-warm: #1E1B17;
+      --text-ink: #F0EAE0;
+      --text-body: #D4CAC0;
+      --text-muted: #8C8070;
+      --color-terra: #E07A5F;
+      --color-terra-light: #2E1F18;
+      --color-terra-dark: #F4A28A;
+      --color-border: #2E2820;
+      --color-divider: #3A3028;
+    }
+    html { background: var(--bg-main); }
+    body {
+      background: var(--bg-main);
+      color: var(--text-body);
+      font-family: var(--font-serif);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* 导航 */
+    .preview-nav {
+      background: rgba(250,247,242,0.92) !important;
+      border-bottom-color: var(--color-border) !important;
+    }
+    .dark .preview-nav { background: rgba(26,23,20,0.92) !important; }
+    .preview-nav .nav-brand { color: var(--text-muted); font-family: var(--font-display); }
+    .preview-nav .nav-links a { color: var(--text-muted); font-family: var(--font-sans); }
+    .preview-nav .nav-links a:hover,
+    .preview-nav .nav-links a.active {
+      background: var(--color-terra);
+      color: #fff;
+      border-radius: 4px;
+    }
+
+    /* ——— Mood Board 主体 ——— */
+    .mb-wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 80px 24px 80px;
+    }
+
+    /* 标题区域 */
+    .mb-hero {
+      padding-bottom: 56px;
+      margin-bottom: 56px;
+      border-bottom: 2px solid var(--color-terra);
+      position: relative;
+    }
+    .mb-tag {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-terra);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mb-tag::before {
+      content: '';
+      width: 24px; height: 2px;
+      background: var(--color-terra);
+      display: inline-block;
+    }
+    .mb-headline {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--text-ink);
+      margin-bottom: 20px;
+    }
+    .mb-headline em {
+      font-style: italic;
+      color: var(--color-terra);
+    }
+    .mb-subline {
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--text-muted);
+      max-width: 520px;
+      font-style: italic;
+    }
+    /* 装饰圆 */
+    .mb-hero::after {
+      content: '';
+      position: absolute;
+      top: 24px; right: 0;
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: var(--color-terra);
+      opacity: 0.12;
+    }
+
+    /* 区块标题 */
+    .section-title {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* 色板 */
+    .swatch-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .swatch-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .swatch-box {
+      width: 72px; height: 72px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .swatch-info {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .swatch-info strong { display: block; color: var(--text-body); font-size: 12px; font-weight: 600; }
+
+    /* 氛围色条 */
+    .vibe-strip {
+      height: 64px;
+      border-radius: 8px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 56px;
+    }
+    .vibe-strip div { flex: 1; }
+
+    /* 字体展示 */
+    .type-demo { margin-bottom: 56px; }
+    .type-row {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .type-display {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--text-ink);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .type-display em { font-style: italic; color: var(--color-terra); }
+    .type-body-text {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--text-body);
+      line-height: 1.9;
+    }
+    .type-caption-text {
+      font-family: var(--font-serif);
+      font-size: 12px;
+      font-style: italic;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+    .type-meta {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+    }
+
+    /* 文章 Featured 卡片 */
+    .featured-card {
+      background: var(--bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 36px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .featured-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--color-terra);
+    }
+    .featured-card:hover {
+      box-shadow: 0 8px 32px rgba(194,98,61,0.1);
+    }
+    .featured-label {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-terra);
+      margin-bottom: 14px;
+    }
+    .featured-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-ink);
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .featured-excerpt {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .featured-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .featured-date {
+      font-family: var(--font-serif);
+      font-size: 12px;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+    .featured-link {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-terra);
+      cursor: pointer;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 2px;
+    }
+
+    /* 小卡片网格 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+    @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .mini-card {
+      padding: 20px 20px 20px 24px;
+      border: 1px solid var(--color-border);
+      border-left: 3px solid var(--color-terra);
+      border-radius: 4px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .mini-card:hover { background: var(--bg-warm); }
+    .mini-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-ink);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .mini-date {
+      font-family: var(--font-serif);
+      font-size: 11px;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    /* 引用块 */
+    .quote-block {
+      border-left: 4px solid var(--color-terra);
+      padding: 20px 24px;
+      margin-bottom: 56px;
+      background: var(--color-terra-light);
+      border-radius: 0 8px 8px 0;
+    }
+    .quote-text {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 700;
+      color: var(--text-ink);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .quote-author {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--color-terra);
+      letter-spacing: 0.08em;
+    }
+
+    /* 按钮 */
+    .btn-terra {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--color-terra);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 4px; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-terra:hover { background: var(--color-terra-dark); transform: translateY(-1px); }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--color-terra);
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 4px;
+      border: 1px solid var(--color-terra);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-outline:hover { background: var(--color-terra-light); }
+
+    .comp-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 32px; }
+
+    /* 标签 */
+    .tag-item {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 3px;
+      background: var(--bg-warm);
+      color: var(--text-muted);
+      border: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+<body>
+  <nav class="preview-nav">
+    <a href="index.html" class="nav-brand">← 返回总览</a>
+    <ul class="nav-links">
+      <li><a href="style-1.html">方案一</a></li>
+      <li><a href="style-2.html">方案二</a></li>
+      <li><a href="style-3.html" class="active">方案三</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="切换主题"></button>
+  </nav>
+
+  <div class="moodboard-container">
+    <div class="mb-wrap">
+
+      <!-- Hero -->
+      <div class="mb-hero animate-fade-up">
+        <div class="mb-tag">方案三 · 推荐方案 · Mood Board</div>
+        <h1 class="mb-headline">温暖<em>编辑</em>风</h1>
+        <p class="mb-subline">"有温度的知识人格化——让博客像一本你最喜欢的杂志，让读者感受到一个真实的人在和他们分享思考。"</p>
+      </div>
+
+      <!-- 色彩体系 -->
+      <div class="animate-fade-up">
+        <div class="section-title">色彩体系 · 60-30-10</div>
+        <div class="swatch-group">
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#FAF7F2; border:1px solid #e8e2d9;"></div>
+            <div class="swatch-info"><strong>60% 暖米白</strong>#FAF7F2<br>主背景</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#1A1714;"></div>
+            <div class="swatch-info"><strong>30% 暖黑棕</strong>#1A1714<br>标题·主文字</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#C2623D;"></div>
+            <div class="swatch-info"><strong>10% 陶土橙红</strong>#C2623D<br>强调·装饰</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#2C2926;"></div>
+            <div class="swatch-info"><strong>正文棕黑</strong>#2C2926<br>正文文字</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#F2E4DC; border:1px solid #e8e2d9;"></div>
+            <div class="swatch-info"><strong>强调淡色</strong>#F2E4DC<br>hover·引用底</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#7A7167;"></div>
+            <div class="swatch-info"><strong>辅助暖灰</strong>#7A7167<br>次要文字</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 氛围色条 -->
+      <div class="vibe-strip animate-fade-up">
+        <div style="background:#FAF7F2;"></div>
+        <div style="background:#F5EFE6;"></div>
+        <div style="background:#F2E4DC;"></div>
+        <div style="background:#D9D1C4;"></div>
+        <div style="background:#7A7167;"></div>
+        <div style="background:#2C2926;"></div>
+        <div style="background:#1A1714;"></div>
+        <div style="background:#C2623D;"></div>
+      </div>
+
+      <!-- 字体展示 -->
+      <div class="type-demo animate-fade-up">
+        <div class="section-title">字体系统</div>
+        <div class="type-row">
+          <div class="type-display">技术与<em>思想</em></div>
+          <div class="type-meta">Playfair Display · 900 Black · 40px · 大标题</div>
+        </div>
+        <div class="type-row">
+          <div class="type-body-text">在这篇文章里，我想分享一个关于 Node.js 事件循环的深层理解。很多教程告诉你"别阻塞事件循环"，却很少解释为什么这个设计决策在 2009 年如此超前，又是如何改变了服务端编程的范式。</div>
+          <div class="type-meta">Lora · 400 Regular · 17px · 正文层级 · 行高 1.9</div>
+        </div>
+        <div class="type-row">
+          <div class="type-caption-text">二〇二六年四月六日 · 后端 · 约 8 分钟</div>
+          <div class="type-meta">Lora · 400 Italic · 12px · 辅助信息</div>
+        </div>
+      </div>
+
+      <!-- 引用组件 -->
+      <div class="animate-fade-up">
+        <div class="section-title">个人格言引用（个人简介页核心元素）</div>
+        <div class="quote-block">
+          <div class="quote-text">"代码是写给人读的，只是顺便能被机器执行。"</div>
+          <div class="quote-author">— 陈明轩 · 个人开发者</div>
+        </div>
+      </div>
+
+      <!-- Featured 文章卡片 -->
+      <div class="animate-fade-up">
+        <div class="section-title">Featured 文章（首篇全宽）</div>
+        <div class="featured-card">
+          <div class="featured-label">精选文章</div>
+          <div class="featured-title">深入理解 Node.js 事件循环机制：从 libuv 到 V8</div>
+          <div class="featured-excerpt">拆解 JavaScript 单线程背后真正的异步原理，掌握这些，才算真正理解 Node.js 的设计哲学...</div>
+          <div class="featured-footer">
+            <span class="featured-date">二〇二六年四月六日</span>
+            <span class="featured-link">阅读全文 →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三列小卡片 -->
+      <div class="animate-fade-up">
+        <div class="section-title">文章列表（三列小卡片）</div>
+        <div class="card-grid">
+          <div class="mini-card">
+            <div class="mini-title">MySQL 索引优化的三个细节</div>
+            <div class="mini-date">二〇二六年三月二十八日</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-title">Express 中间件的执行顺序</div>
+            <div class="mini-date">二〇二六年三月十五日</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-title">为什么我从 Redux 切换到 Zustand</div>
+            <div class="mini-date">二〇二六年三月一日</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 按钮与标签 -->
+      <div class="animate-fade-up">
+        <div class="section-title">交互元素</div>
+        <div class="comp-row">
+          <button class="btn-terra">发布文章</button>
+          <button class="btn-outline">查看全部</button>
+          <span class="tag-item">后端</span>
+          <span class="tag-item">Node.js</span>
+          <span class="tag-item">数据库</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="components.js"></script>
+</body>
+</html>
