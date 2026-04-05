@@ -1,0 +1,52 @@
+  </main><!-- /.site-main -->
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">
+        &copy; <%= profile ? profile.copyrightYear : new Date().getFullYear() %>
+        <%= profile ? profile.name : '我的博客' %>
+        &nbsp;&middot;&nbsp;
+        <%= profile ? profile.tagline : '' %>
+      </p>
+      <% if (profile && profile.socialLinks && profile.socialLinks.length) { %>
+        <div class="footer-social">
+          <% profile.socialLinks.forEach(function(link) { %>
+            <a href="<%= link.url %>" class="social-link" target="_blank" rel="noopener noreferrer">
+              <%= link.label %>
+            </a>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </footer>
+
+  <script>
+    // 阅读进度条
+    (function() {
+      var bar = document.getElementById('progress-bar');
+      if (!bar) return;
+      function updateProgress() {
+        var scrollTop = window.scrollY || document.documentElement.scrollTop;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var progress  = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = progress + '%';
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    })();
+
+    // 移动端菜单
+    (function() {
+      var toggle = document.getElementById('nav-toggle');
+      var menu   = document.getElementById('nav-mobile');
+      if (!toggle || !menu) return;
+      toggle.addEventListener('click', function() {
+        var expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        menu.classList.toggle('is-open');
+      });
+    })();
+  </script>
+</body>
+</html>
