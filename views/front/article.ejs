@@ -1,0 +1,38 @@
+<%- include('../layouts/_header') %>
+
+<div class="container front-article">
+
+  <article class="article-full">
+
+    <!-- 文章头部 -->
+    <header class="article-header">
+      <h1 class="article-title"><%= article.title %></h1>
+      <div class="article-meta">
+        <time class="article-date" datetime="<%= article.published_at ? new Date(article.published_at).toISOString() : '' %>">
+          <%= article.published_at ? new Date(article.published_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) : '' %>
+        </time>
+        <% if (article.tags) { %>
+          <div class="article-tags">
+            <% article.tags.split(',').forEach(function(tag) { tag = tag.trim(); if (tag) { %>
+              <span class="tag"><%= tag %></span>
+            <% } }); %>
+          </div>
+        <% } %>
+      </div>
+    </header>
+
+    <!-- 文章正文（HTML 内容） -->
+    <div class="article-body prose">
+      <%- article.content %>
+    </div>
+
+    <!-- 文章底部 -->
+    <footer class="article-footer">
+      <a href="/" class="article-back-link">← 返回文章列表</a>
+    </footer>
+
+  </article>
+
+</div>
+
+<%- include('../layouts/_footer') %>
