@@ -1,0 +1,160 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Aliyun CLI
+        run: |
+          curl -sL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz | tar xz
+          sudo mv aliyun /usr/local/bin/
+          aliyun configure set --profile default --mode AK \
+            --access-key-id "$ALIBABA_CLOUD_ACCESS_KEY_ID" \
+            --access-key-secret "$ALIBABA_CLOUD_ACCESS_KEY_SECRET" \
+            --region cn-shanghai
+        env:
+          ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
+          ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+
+      - name: Deploy to SAE (v1 API — 复用 staging-latest 镜像)
+        run: |
+          strip_bom() { sed 's/^\xEF\xBB\xBF//'; }
+          APP_ID="${{ secrets.SAE_PRODUCTION_APP_ID }}"
+          IMAGE="${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/${{ github.event.repository.name }}:staging-latest"
+
+          echo "📦 部署镜像（复用 staging 验证版本）: $IMAGE"
+          echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY }} -u ${{ secrets.ACR_USERNAME }} --password-stdin
+
+          DEPLOY_RESULT=$(aliyun sae POST /pop/v1/sam/app/deployApplication \
+            --AppId "${APP_ID}" \
+            --ImageUrl "${IMAGE}" 2>&1) || true
+          echo "$DEPLOY_RESULT"
+          echo "$DEPLOY_RESULT" | strip_bom | jq -e '.Success == true' || { echo "❌ SAE 部署失败"; exit 1; }
+
+          CHANGE_ORDER_ID=$(echo "$DEPLOY_RESULT" | strip_bom | jq -r '.Data.ChangeOrderId')
+          echo "✅ 部署已触发，ChangeOrderId: $CHANGE_ORDER_ID"
+
+          # 等待部署完成（最多 5 分钟）
+          # SAE ChangeOrder Status: 0=准备中, 1=执行中, 2=成功, 3=失败, 6=中止, 10=超时
+          echo "⏳ 等待部署完成..."
+          for i in $(seq 1 30); do
+            sleep 10
+            STATUS_RESULT=$(aliyun sae GET /pop/v1/sam/changeorder/DescribeChangeOrder \
+              --ChangeOrderId "${CHANGE_ORDER_ID}" 2>&1) || true
+            STATUS=$(echo "$STATUS_RESULT" | strip_bom | jq -r '.Data.Status // empty')
+            echo "  状态: $STATUS ($i/30)"
+            if [ "$STATUS" = "2" ]; then
+              echo "✅ 部署成功"
+              break
+            elif [ "$STATUS" = "3" ] || [ "$STATUS" = "6" ] || [ "$STATUS" = "10" ]; then
+              echo "❌ 部署失败 (Status=$STATUS)"
+              exit 1
+            fi
+          done
+          # 超时兜底：循环结束但未明确成功，视为失败
+          if [ "$STATUS" != "2" ]; then
+            echo "❌ 部署超时或状态未知 (最终 Status=$STATUS)"
+            exit 1
+          fi
+          echo "CHANGE_ORDER_ID=$CHANGE_ORDER_ID" >> $GITHUB_ENV
+
+      - name: Bind SLB (Public Access)
+        run: |
+          strip_bom() { sed 's/^\xEF\xBB\xBF//'; }
+          APP_ID="${{ secrets.SAE_PRODUCTION_APP_ID }}"
+
+          # 等待部署变更单完全释放（避免 ChangerOrderRunning）
+          if [ -n "$CHANGE_ORDER_ID" ]; then
+            echo "⏳ 等待部署变更单释放..."
+            for i in $(seq 1 6); do
+              CO_RESULT=$(aliyun sae GET /pop/v1/sam/changeorder/DescribeChangeOrder \
+                --ChangeOrderId "${CHANGE_ORDER_ID}" 2>&1) || true
+              CO_STATUS=$(echo "$CO_RESULT" | strip_bom | jq -r '.Data.Status // empty')
+              if [ "$CO_STATUS" = "2" ] || [ "$CO_STATUS" = "3" ] || [ "$CO_STATUS" = "6" ] || [ "$CO_STATUS" = "10" ]; then
+                echo "✅ 变更单已完成 (Status=$CO_STATUS)"
+                break
+              fi
+              echo "  变更单状态: $CO_STATUS ($i/6)，等待 10s..."
+              sleep 10
+            done
+          fi
+
+          # 先尝试 v1 API 检查 SLB
+          SLB_RESULT=$(aliyun sae GET /pop/v1/sam/app/slb --AppId ${APP_ID} 2>&1) || true
+          echo "$SLB_RESULT"
+
+          # 检查是否为 v2 应用（v1 API 会报 InvalidAppId.NotFound）
+          if echo "$SLB_RESULT" | grep -q "InvalidAppId.NotFound"; then
+            echo "⚠️ v1 API 不识别此 AppId，可能是 v2 应用。跳过 SLB 绑定（SAE v2 应用自带公网访问）。"
+            echo "SLB_IP=（使用 SAE 默认域名）" >> $GITHUB_ENV
+          else
+            EXISTING_IP=$(echo "$SLB_RESULT" | strip_bom | jq -r '.Data.InternetIp // empty')
+
+            if [ -n "$EXISTING_IP" ] && [ "$EXISTING_IP" != "null" ]; then
+              echo "✅ SLB 已绑定，公网 IP: $EXISTING_IP"
+              echo "SLB_IP=$EXISTING_IP" >> $GITHUB_ENV
+            else
+              echo "📡 绑定公网 SLB（端口 80 → 8080）..."
+              BIND_RESULT=$(aliyun sae POST /pop/v1/sam/app/slb \
+                --AppId ${APP_ID} \
+                --Internet '[{"port":80,"targetPort":8080,"protocol":"HTTP"}]' 2>&1) || true
+              echo "$BIND_RESULT"
+
+              # 如果遇到 ChangerOrderRunning，等待后重试一次
+              if echo "$BIND_RESULT" | grep -q "ChangerOrderRunning"; then
+                echo "⚠️ 变更单仍在执行中，等待 30s 后重试..."
+                sleep 30
+                BIND_RESULT=$(aliyun sae POST /pop/v1/sam/app/slb \
+                  --AppId ${APP_ID} \
+                  --Internet '[{"port":80,"targetPort":8080,"protocol":"HTTP"}]' 2>&1) || true
+                echo "$BIND_RESULT"
+              fi
+
+              echo "$BIND_RESULT" | strip_bom | jq -e '.Success == true' || { echo "⚠️ SLB 绑定失败（可能需要手动处理）"; }
+
+              # 等待 SLB 绑定生效
+              echo "等待 SLB 绑定生效..."
+              for i in $(seq 1 12); do
+                sleep 10
+                CHECK=$(aliyun sae GET /pop/v1/sam/app/slb --AppId ${APP_ID} 2>&1) || true
+                NEW_IP=$(echo "$CHECK" | strip_bom | jq -r '.Data.InternetIp // empty')
+                if [ -n "$NEW_IP" ] && [ "$NEW_IP" != "null" ]; then
+                  echo "✅ SLB 绑定成功，公网 IP: $NEW_IP"
+                  echo "SLB_IP=$NEW_IP" >> $GITHUB_ENV
+                  break
+                fi
+                echo "  等待中... ($i/12)"
+              done
+            fi
+          fi
+
+      - name: Notify Feishu
+        if: success()
+        run: |
+          TOKEN=$(curl -s -X POST https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal \
+            -H "Content-Type: application/json" \
+            -d "{\"app_id\":\"${{ secrets.FEISHU_APP_ID }}\",\"app_secret\":\"${{ secrets.FEISHU_APP_SECRET }}\"}" \
+            | jq -r '.tenant_access_token')
+          STATUS_TEXT="${{ job.status == 'success' && '成功' || '失败' }}"
+          EMOJI="${{ job.status == 'success' && '🚀' || '❌' }}"
+          SLB_LINE=""
+          if [ -n "$SLB_IP" ]; then SLB_LINE="\n公网访问: http://$SLB_IP"; fi
+          MSG="${EMOJI} Production 部署${STATUS_TEXT} — ${{ github.event.repository.name }}
+          提交: ${{ github.sha }}${SLB_LINE}"
+          PAYLOAD=$(jq -n \
+            --arg rid "${{ secrets.FEISHU_NOTIFY_OPEN_ID }}" \
+            --arg msg "$MSG" \
+            '{receive_id: $rid, msg_type: "text", content: ({text: $msg} | tostring)}')
+          curl -s -X POST "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
