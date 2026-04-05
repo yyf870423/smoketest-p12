@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — 博客后台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+
+  <!-- 后台顶部导航 -->
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <span class="admin-header-logo">博客后台</span>
+      <nav class="admin-header-nav">
+        <a href="/admin/articles" class="admin-nav-link admin-nav-link-active">文章管理</a>
+        <a href="/" class="admin-nav-link" target="_blank" rel="noopener">查看前台</a>
+        <a href="/admin/logout" class="admin-nav-link admin-nav-logout">退出 (<%= username %>)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="admin-container">
+
+      <!-- 页面标题 + 操作按钮 -->
+      <div class="admin-page-header">
+        <h2 class="admin-page-title">文章管理</h2>
+        <a href="/admin/articles/new" class="btn btn-primary">+ 新建文章</a>
+      </div>
+
+      <!-- 统计信息 -->
+      <p class="admin-meta-info">共 <strong><%= total %></strong> 篇文章</p>
+
+      <!-- 文章列表表格 -->
+      <% if (articles && articles.length > 0) { %>
+        <div class="table-wrap">
+          <table class="articles-table">
+            <thead>
+              <tr>
+                <th style="width:60px">ID</th>
+                <th>标题</th>
+                <th style="width:90px">状态</th>
+                <th style="width:120px">发布时间</th>
+                <th style="width:160px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% articles.forEach(function(article) { %>
+                <tr>
+                  <td><%= article.id %></td>
+                  <td>
+                    <a href="/admin/articles/<%= article.id %>/edit" class="admin-article-link">
+                      <%= article.title %>
+                    </a>
+                  </td>
+                  <td>
+                    <span class="status-badge <%= article.status === 'published' ? 'published' : 'draft' %>">
+                      <%= article.status === 'published' ? '已发布' : '草稿' %>
+                    </span>
+                  </td>
+                  <td>
+                    <% if (article.published_at) { %>
+                      <%= new Date(article.published_at).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }) %>
+                    <% } else { %>
+                      <span style="color: var(--color-text-muted)">—</span>
+                    <% } %>
+                  </td>
+                  <td class="table-actions">
+                    <a href="/admin/articles/<%= article.id %>/edit" class="btn btn-sm btn-ghost">编辑</a>
+                    <% if (article.status === 'published') { %>
+                      <a href="/article/<%= article.id %>" class="btn btn-sm btn-ghost" target="_blank" rel="noopener">查看</a>
+                    <% } %>
+                    <form
+                      method="POST"
+                      action="/admin/articles/<%= article.id %>/delete"
+                      style="display:inline"
+                      onsubmit="return confirm('确定要删除该文章吗？此操作不可撤销。')"
+                    >
+                      <button class="btn btn-sm btn-danger" type="submit">删除</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 分页 -->
+        <% if (totalPages > 1) { %>
+          <nav class="pagination" aria-label="分页导航" style="margin-top: 24px;">
+            <% if (currentPage > 1) { %>
+              <a href="/admin/articles?page=<%= currentPage - 1 %>">← 上一页</a>
+            <% } else { %>
+              <span style="opacity:0.4">← 上一页</span>
+            <% } %>
+
+            <span>第 <%= currentPage %> / <%= totalPages %> 页</span>
+
+            <% if (currentPage < totalPages) { %>
+              <a href="/admin/articles?page=<%= currentPage + 1 %>">下一页 →</a>
+            <% } else { %>
+              <span style="opacity:0.4">下一页 →</span>
+            <% } %>
+          </nav>
+        <% } %>
+
+      <% } else { %>
+        <div class="empty-state">
+          <p class="empty-state-text">还没有文章，<a href="/admin/articles/new">马上写一篇</a>。</p>
+        </div>
+      <% } %>
+
+    </div>
+  </main>
+
+</body>
+</html>
