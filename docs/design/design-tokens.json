@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json.schemastore.org/design-tokens",
+  "_comment": "极简墨笔风 Design Tokens — smoketest-p12 个人博客系统",
+
+  "color": {
+    "surface": {
+      "primary":   { "light": "#F5F2EC", "dark": "#1A1916",  "_note": "主背景，60%，米白/深墨" },
+      "secondary": { "light": "#EDE9E1", "dark": "#252320",  "_note": "次级背景，卡片/侧边" },
+      "overlay":   { "light": "#E4DFD4", "dark": "#2E2C28",  "_note": "悬浮层/代码块背景" }
+    },
+    "text": {
+      "primary":   { "light": "#1C1C1C", "dark": "#E8E4DC",  "_note": "正文主色" },
+      "secondary": { "light": "#5C5852", "dark": "#9C9890",  "_note": "辅助说明文字" },
+      "muted":     { "light": "#9A9590", "dark": "#6B6760",  "_note": "禁用/placeholder" },
+      "inverse":   { "light": "#F5F2EC", "dark": "#1A1916",  "_note": "反色（用于深色按钮上的文字）" }
+    },
+    "accent": {
+      "DEFAULT":   { "light": "#2D6A4F", "dark": "#52B788",  "_note": "强调色，10%，墨绿" },
+      "hover":     { "light": "#245A41", "dark": "#74C69D",  "_note": "强调色 hover 状态" },
+      "muted":     { "light": "#D4E8DC", "dark": "#1B3D2A",  "_note": "强调色低饱和版，用于 tag 背景" }
+    },
+    "border": {
+      "DEFAULT":   { "light": "#D5D0C8", "dark": "#3A3833",  "_note": "默认边框" },
+      "strong":    { "light": "#A8A39A", "dark": "#524F4A",  "_note": "强边框（分割线）" },
+      "accent":    { "light": "#2D6A4F", "dark": "#52B788",  "_note": "强调色边框" }
+    },
+    "feedback": {
+      "error":     { "light": "#C0392B", "dark": "#E74C3C",  "_note": "错误/危险" },
+      "warning":   { "light": "#E67E22", "dark": "#F39C12",  "_note": "警告" },
+      "success":   { "light": "#27AE60", "dark": "#2ECC71",  "_note": "成功" },
+      "info":      { "light": "#2D6A4F", "dark": "#52B788",  "_note": "信息（复用强调色）" }
+    },
+    "ink": {
+      "wash-1":    "#F0EBE0",
+      "wash-2":    "#D9D2C4",
+      "wash-3":    "#B5ADA0",
+      "_note": "墨迹渐变系列，用于装饰性背景元素"
+    }
+  },
+
+  "typography": {
+    "fontFamily": {
+      "heading":  "'Noto Serif SC', 'Source Han Serif SC', serif",
+      "body":     "'LXGW WenKai', 'Noto Serif SC', serif",
+      "mono":     "'JetBrains Mono', 'Fira Code', monospace",
+      "latin":    "'Playfair Display', serif"
+    },
+    "fontSize": {
+      "xs":   { "desktop": "12px", "mobile": "11px", "lineHeight": "1.5" },
+      "sm":   { "desktop": "14px", "mobile": "13px", "lineHeight": "1.6" },
+      "base": { "desktop": "16px", "mobile": "15px", "lineHeight": "1.8" },
+      "md":   { "desktop": "18px", "mobile": "17px", "lineHeight": "1.75" },
+      "lg":   { "desktop": "22px", "mobile": "20px", "lineHeight": "1.6" },
+      "xl":   { "desktop": "28px", "mobile": "24px", "lineHeight": "1.4" },
+      "2xl":  { "desktop": "36px", "mobile": "28px", "lineHeight": "1.3" },
+      "3xl":  { "desktop": "48px", "mobile": "36px", "lineHeight": "1.2" }
+    },
+    "fontWeight": {
+      "regular":  "400",
+      "medium":   "500",
+      "semibold": "600",
+      "bold":     "700"
+    },
+    "letterSpacing": {
+      "tighter": "-0.02em",
+      "tight":   "-0.01em",
+      "normal":  "0",
+      "wide":    "0.04em",
+      "wider":   "0.08em",
+      "widest":  "0.16em"
+    },
+    "scale": {
+      "h1": {
+        "fontSize":      "48px",
+        "fontWeight":    "700",
+        "fontFamily":    "heading",
+        "lineHeight":    "1.2",
+        "letterSpacing": "-0.02em",
+        "mobile":        { "fontSize": "36px" }
+      },
+      "h2": {
+        "fontSize":      "36px",
+        "fontWeight":    "600",
+        "fontFamily":    "heading",
+        "lineHeight":    "1.3",
+        "letterSpacing": "-0.01em",
+        "mobile":        { "fontSize": "28px" }
+      },
+      "h3": {
+        "fontSize":      "24px",
+        "fontWeight":    "600",
+        "fontFamily":    "heading",
+        "lineHeight":    "1.4",
+        "mobile":        { "fontSize": "20px" }
+      },
+      "body": {
+        "fontSize":   "16px",
+        "fontWeight": "400",
+        "fontFamily": "body",
+        "lineHeight": "1.8"
+      },
+      "caption": {
+        "fontSize":      "13px",
+        "fontWeight":    "400",
+        "fontFamily":    "body",
+        "lineHeight":    "1.6",
+        "letterSpacing": "0.02em"
+      },
+      "label": {
+        "fontSize":      "12px",
+        "fontWeight":    "500",
+        "fontFamily":    "body",
+        "lineHeight":    "1.5",
+        "letterSpacing": "0.08em",
+        "textTransform": "uppercase"
+      }
+    }
+  },
+
+  "spacing": {
+    "0":   "0px",
+    "1":   "4px",
+    "2":   "8px",
+    "3":   "12px",
+    "4":   "16px",
+    "5":   "20px",
+    "6":   "24px",
+    "8":   "32px",
+    "10":  "40px",
+    "12":  "48px",
+    "16":  "64px",
+    "20":  "80px",
+    "24":  "96px",
+    "32":  "128px",
+    "layout": {
+      "sidebarWidth":    "280px",
+      "contentMaxWidth": "720px",
+      "pageMaxWidth":    "1200px",
+      "headerHeight":    "64px",
+      "mobileHeaderHeight": "56px"
+    }
+  },
+
+  "borderRadius": {
+    "none":   "0px",
+    "sm":     "2px",
+    "DEFAULT":"4px",
+    "md":     "6px",
+    "lg":     "8px",
+    "xl":     "12px",
+    "2xl":    "16px",
+    "full":   "9999px"
+  },
+
+  "shadow": {
+    "none":  "none",
+    "sm":    "0 1px 3px rgba(28,28,28,0.08)",
+    "DEFAULT":"0 2px 8px rgba(28,28,28,0.10)",
+    "md":    "0 4px 16px rgba(28,28,28,0.12)",
+    "lg":    "0 8px 32px rgba(28,28,28,0.14)",
+    "inner": "inset 0 1px 3px rgba(28,28,28,0.08)",
+    "dark": {
+      "sm":  "0 1px 3px rgba(0,0,0,0.30)",
+      "DEFAULT":"0 2px 8px rgba(0,0,0,0.35)",
+      "md":  "0 4px 16px rgba(0,0,0,0.40)",
+      "lg":  "0 8px 32px rgba(0,0,0,0.45)"
+    }
+  },
+
+  "motion": {
+    "duration": {
+      "instant":  "80ms",
+      "fast":     "150ms",
+      "normal":   "250ms",
+      "slow":     "400ms",
+      "slower":   "600ms",
+      "page":     "500ms"
+    },
+    "easing": {
+      "in":         "cubic-bezier(0.4, 0, 1, 1)",
+      "out":        "cubic-bezier(0, 0, 0.2, 1)",
+      "inOut":      "cubic-bezier(0.4, 0, 0.2, 1)",
+      "spring":     "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "emphasized": "cubic-bezier(0.2, 0, 0, 1.0)"
+    },
+    "stagger": {
+      "children":  "60ms",
+      "list":      "40ms"
+    }
+  },
+
+  "breakpoint": {
+    "mobile":  "375px",
+    "tablet":  "768px",
+    "desktop": "1024px",
+    "wide":    "1440px"
+  },
+
+  "zIndex": {
+    "base":     "0",
+    "raised":   "10",
+    "dropdown": "100",
+    "sticky":   "200",
+    "overlay":  "300",
+    "modal":    "400",
+    "toast":    "500"
+  },
+
+  "component": {
+    "button": {
+      "primary": {
+        "bg":          "color.accent.DEFAULT",
+        "text":        "color.text.inverse",
+        "border":      "none",
+        "borderRadius":"borderRadius.md",
+        "paddingX":    "spacing.6",
+        "paddingY":    "spacing.3",
+        "fontSize":    "typography.fontSize.sm",
+        "fontWeight":  "typography.fontWeight.medium",
+        "letterSpacing":"typography.letterSpacing.wide",
+        "hover": { "bg": "color.accent.hover", "transform": "translateY(-1px)", "shadow": "shadow.md" },
+        "active": { "transform": "scale(0.97)", "shadow": "shadow.sm" },
+        "transition": "all 200ms cubic-bezier(0,0,0.2,1)"
+      },
+      "ghost": {
+        "bg":          "transparent",
+        "text":        "color.accent.DEFAULT",
+        "border":      "1px solid color.accent.DEFAULT",
+        "borderRadius":"borderRadius.md",
+        "paddingX":    "spacing.6",
+        "paddingY":    "spacing.3",
+        "hover": { "bg": "color.accent.muted" }
+      }
+    },
+    "card": {
+      "bg":          "color.surface.secondary",
+      "border":      "1px solid color.border.DEFAULT",
+      "borderRadius":"borderRadius.lg",
+      "padding":     "spacing.8",
+      "shadow":      "shadow.sm",
+      "hover": {
+        "shadow":    "shadow.md",
+        "transform": "translateY(-2px)",
+        "borderColor":"color.border.accent"
+      },
+      "transition":  "all 250ms cubic-bezier(0,0,0.2,1)"
+    },
+    "tag": {
+      "bg":          "color.accent.muted",
+      "text":        "color.accent.DEFAULT",
+      "borderRadius":"borderRadius.full",
+      "paddingX":    "spacing.3",
+      "paddingY":    "spacing.1",
+      "fontSize":    "typography.fontSize.xs",
+      "fontWeight":  "typography.fontWeight.medium"
+    },
+    "input": {
+      "bg":          "color.surface.primary",
+      "border":      "1px solid color.border.DEFAULT",
+      "borderRadius":"borderRadius.md",
+      "paddingX":    "spacing.4",
+      "paddingY":    "spacing.3",
+      "fontSize":    "typography.fontSize.base",
+      "focus": {
+        "borderColor": "color.accent.DEFAULT",
+        "shadow":      "0 0 0 3px rgba(45,106,79,0.12)"
+      }
+    },
+    "divider": {
+      "color": "color.border.DEFAULT",
+      "style": "1px solid",
+      "inkStyle": "border-image: repeating-linear-gradient(90deg, #D5D0C8 0px, #D5D0C8 4px, transparent 4px, transparent 8px) 1"
+    },
+    "articleCard": {
+      "layout": "水平布局（桌面），垂直布局（移动）",
+      "imageRatio": "16:9",
+      "tagPosition": "标题上方",
+      "dateFormat": "YYYY年MM月DD日",
+      "excerptLines": 2
+    },
+    "codeBlock": {
+      "bg":          "color.surface.overlay",
+      "border":      "1px solid color.border.DEFAULT",
+      "borderRadius":"borderRadius.md",
+      "padding":     "spacing.6",
+      "fontFamily":  "typography.fontFamily.mono",
+      "fontSize":    "typography.fontSize.sm",
+      "lineHeight":  "1.7"
+    },
+    "blockquote": {
+      "borderLeft":  "3px solid color.accent.DEFAULT",
+      "bg":          "color.accent.muted",
+      "paddingX":    "spacing.6",
+      "paddingY":    "spacing.4",
+      "fontStyle":   "italic"
+    },
+    "nav": {
+      "height":       "spacing.layout.headerHeight",
+      "bg":           "color.surface.primary",
+      "borderBottom": "1px solid color.border.DEFAULT",
+      "backdropBlur": "12px",
+      "position":     "sticky",
+      "top":          "0",
+      "zIndex":       "zIndex.sticky"
+    },
+    "scrollProgress": {
+      "height": "2px",
+      "bg":     "color.accent.DEFAULT",
+      "top":    "0",
+      "zIndex": "zIndex.sticky"
+    }
+  },
+
+  "decoration": {
+    "inkBrush": {
+      "_note": "水墨笔触装饰，使用 SVG 或 CSS 伪元素实现",
+      "opacity": "0.06",
+      "color":   "#1C1C1C"
+    },
+    "noiseTex": {
+      "_note": "噪点纹理覆盖层，使用 SVG feTurbulence",
+      "opacity": "0.03",
+      "baseFrequency": "0.65"
+    },
+    "paperGrain": {
+      "_note": "纸张颗粒质感，叠加于主背景之上",
+      "background": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")"
+    }
+  }
+}

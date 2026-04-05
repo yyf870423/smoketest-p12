@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — 页面未找到</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ── 404 页专属样式 ── */
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-12) var(--space-6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 背景水墨晕染 */
+    .error-page::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--color-accent-muted) 0%, transparent 65%);
+      opacity: 0.3;
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+    }
+    /* 大号 404 */
+    .error-number {
+      font-family: var(--font-latin);
+      font-size: clamp(120px, 20vw, 200px);
+      font-weight: 700;
+      line-height: 0.85;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--color-ink-wash-3);
+      letter-spacing: -0.05em;
+      user-select: none;
+      animation: fadeUp 0.7s ease-out both;
+      position: relative;
+    }
+    /* 水墨笔触叠加 */
+    .error-number::after {
+      content: '404';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        var(--color-accent-muted) 0%,
+        transparent 50%,
+        var(--color-ink-wash-2) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-stroke: 0;
+      opacity: 0.5;
+    }
+    .error-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-top: var(--space-6);
+      animation: fadeUp 0.7s ease-out 0.15s both;
+    }
+    .error-desc {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      max-width: 420px;
+      line-height: 1.8;
+      margin-top: var(--space-3);
+      animation: fadeUp 0.7s ease-out 0.3s both;
+    }
+    .error-actions {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-8);
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s ease-out 0.45s both;
+    }
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-7);
+      background: var(--color-accent);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-home:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45,106,79,0.25);
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-7);
+      border: 1.5px solid var(--color-border-strong);
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      text-decoration: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-back:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+    /* 装饰性笔画 */
+    .ink-stroke {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.08;
+    }
+    .ink-stroke-1 {
+      top: 10%;
+      left: 5%;
+      width: 150px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-accent), transparent);
+      transform: rotate(-15deg);
+    }
+    .ink-stroke-2 {
+      bottom: 15%;
+      right: 8%;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--color-ink-wash-3));
+      transform: rotate(10deg);
+    }
+    .ink-stroke-3 {
+      top: 20%;
+      right: 12%;
+      width: 60px;
+      height: 60px;
+      border: 2px solid var(--color-accent);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部简化导航 -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-cn">墨迹</span>
+        <span class="logo-en">Blog</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">文章</a>
+        <a href="about.html" class="nav-link">关于</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="ThemeManager.toggle()" title="切换主题">
+          <span class="theme-icon">☀</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 404 内容 -->
+  <main class="error-page">
+    <!-- 装饰笔画 -->
+    <div class="ink-stroke ink-stroke-1"></div>
+    <div class="ink-stroke ink-stroke-2"></div>
+    <div class="ink-stroke ink-stroke-3"></div>
+
+    <div class="error-number">404</div>
+    <h1 class="error-title">这页纸似乎找不到了</h1>
+    <p class="error-desc">
+      你访问的页面可能已被移动、删除，或者从未存在过。<br>
+      就像一篇没有写完的文章，有些遗憾，但也情有可原。
+    </p>
+    <div class="error-actions">
+      <a href="index.html" class="btn-home">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        回到首页
+      </a>
+      <button class="btn-back" onclick="history.back()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+        返回上一页
+      </button>
+    </div>
+  </main>
+
+  <script src="components.js"></script>
+</body>
+</html>
