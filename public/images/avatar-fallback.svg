@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <rect width="120" height="120" rx="60" fill="#f0ede8"/>
+  <circle cx="60" cy="45" r="20" fill="#8b6f47"/>
+  <ellipse cx="60" cy="90" rx="30" ry="20" fill="#8b6f47"/>
+  <text x="60" y="115" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#8b6f47">博主</text>
+</svg>
