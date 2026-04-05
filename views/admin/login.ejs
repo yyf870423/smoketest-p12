@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — 博客后台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+
+  <div class="login-page">
+    <div class="login-card">
+      <!-- Logo / 标题 -->
+      <h1 class="login-title">博客后台</h1>
+      <p class="login-subtitle">管理员登录</p>
+
+      <!-- 错误提示 -->
+      <% if (error) { %>
+        <div class="alert alert-error" role="alert">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <!-- 登录表单 -->
+      <form method="POST" action="/admin/login" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">用户名</label>
+          <input
+            class="form-control"
+            type="text"
+            id="username"
+            name="username"
+            autocomplete="username"
+            autofocus
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">密码</label>
+          <input
+            class="form-control"
+            type="password"
+            id="password"
+            name="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">登录</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

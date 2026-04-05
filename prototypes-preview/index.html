@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>风格预选 — 个人博客 smoketest-p12</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    :root {
+      --bg: #f8f6f2;
+      --surface: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --border: #e8e4dc;
+      --accent: #3d3d3d;
+    }
+    .dark {
+      --bg: #141210;
+      --surface: #1e1c19;
+      --text-primary: #ede8df;
+      --text-secondary: #9a9080;
+      --border: #2e2a24;
+      --accent: #d4c8b8;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .preview-nav { background: rgba(255,255,255,0.9); }
+    .dark .preview-nav { background: rgba(20,18,16,0.9); }
+    .dark .preview-nav .nav-brand { color: var(--text-primary); }
+    .dark .preview-nav .nav-links a { color: var(--text-secondary); }
+    .dark .preview-nav .nav-links a:hover { background: var(--text-primary); color: var(--bg); }
+
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 80px 24px 40px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+    .hero p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    /* ——— 风格卡片网格 ——— */
+    .style-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    @media (max-width: 768px) {
+      .style-grid { grid-template-columns: 1fr; }
+    }
+
+    .style-card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+                  box-shadow 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+    .style-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+    }
+
+    .card-preview {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 风格 1：极简墨笔风 */
+    .card-preview.style1 {
+      background: #F5F2EC;
+      color: #1C1C1C;
+      font-family: 'Noto Serif SC', serif;
+    }
+    .card-preview.style1::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: #2D6A4F;
+    }
+    /* 风格 2：赛博极光风 */
+    .card-preview.style2 {
+      background: #0E0E14;
+      color: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .card-preview.style2 .preview-text {
+      background: linear-gradient(135deg, #A855F7, #06B6D4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+    }
+    .card-preview.style2 { background: #0E0E14; }
+    /* 风格 3：温暖编辑风 */
+    .card-preview.style3 {
+      background: #FAF7F2;
+      color: #1A1714;
+      font-family: 'Playfair Display', 'Noto Serif SC', serif;
+    }
+    .card-preview.style3::after {
+      content: '';
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #C2623D;
+      opacity: 0.2;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+    .card-num {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .card-desc {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      margin-top: 16px;
+      transition: gap 0.2s ease;
+    }
+    .style-card:hover .card-cta { gap: 10px; }
+
+    /* 推荐标签 */
+    .recommended-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #C2623D;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    /* 分隔线 */
+    .divider {
+      max-width: 860px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      max-width: 860px;
+      margin: 0 auto 24px;
+      padding: 0 24px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <nav class="preview-nav">
+    <a href="index.html" class="nav-brand">风格预选 · smoketest-p12</a>
+    <ul class="nav-links">
+      <li><a href="style-1.html">方案一</a></li>
+      <li><a href="style-2.html">方案二</a></li>
+      <li><a href="style-3.html">方案三</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="切换主题"></button>
+  </nav>
+
+  <div class="moodboard-container">
+    <div class="hero animate-fade-up">
+      <div class="hero-label">UX 风格预选 · iter-1</div>
+      <h1>三种截然不同的<br>个人博客视觉方向</h1>
+      <p>以下三个方案代表了完全不同的设计哲学，请点击各方案查看 Mood Board 详情，选择最符合博客定位的风格。</p>
+    </div>
+
+    <p class="section-label">选择你的风格方向</p>
+    <hr class="divider">
+
+    <div class="style-grid">
+      <!-- 方案一 -->
+      <a href="style-1.html" class="style-card animate-fade-up">
+        <div class="card-preview style1">
+          <span>墨</span>
+        </div>
+        <div class="card-body">
+          <div class="card-num">方案一</div>
+          <div class="card-title">极简墨笔风</div>
+          <div class="card-desc">以东方留白美学驱动的克制内容主义。宋体标题 + 文楷正文，奶油白背景，深绿强调色。</div>
+          <div class="card-tags">
+            <span class="tag">极简</span>
+            <span class="tag">留白</span>
+            <span class="tag">东方美学</span>
+          </div>
+          <div class="card-cta">查看 Mood Board →</div>
+        </div>
+      </a>
+
+      <!-- 方案二 -->
+      <a href="style-2.html" class="style-card animate-fade-up">
+        <div class="card-preview style2">
+          <span class="preview-text">&lt;DEV/&gt;</span>
+        </div>
+        <div class="card-body">
+          <div class="card-num">方案二</div>
+          <div class="card-title">赛博极光风</div>
+          <div class="card-desc">暗色宇宙中的代码诗人美学。深蓝黑背景，紫青渐变发光，等宽字体标题，极具技术身份感。</div>
+          <div class="card-tags">
+            <span class="tag">深色主题</span>
+            <span class="tag">赛博</span>
+            <span class="tag">代码美学</span>
+          </div>
+          <div class="card-cta">查看 Mood Board →</div>
+        </div>
+      </a>
+
+      <!-- 方案三 -->
+      <a href="style-3.html" class="style-card animate-fade-up">
+        <div class="card-preview style3">
+          <span>Editorial</span>
+        </div>
+        <div class="card-body">
+          <div class="recommended-badge">★ 推荐</div>
+          <div class="card-num">方案三</div>
+          <div class="card-title">温暖编辑风</div>
+          <div class="card-desc">有温度的知识人格化——像一本最喜欢的杂志。Playfair Display 标题，陶土橙强调色，杂志编辑布局。</div>
+          <div class="card-tags">
+            <span class="tag">编辑风格</span>
+            <span class="tag">人格化</span>
+            <span class="tag">温暖</span>
+          </div>
+          <div class="card-cta">查看 Mood Board →</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <script src="components.js"></script>
+</body>
+</html>

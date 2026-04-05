@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>方案一：极简墨笔风 — Mood Board</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ——— 极简墨笔风 Design Tokens ——— */
+    :root {
+      --bg-main: #F5F2EC;
+      --bg-card: #FFFFFF;
+      --bg-hover: #EDE9E0;
+      --color-ink: #1C1C1C;
+      --color-body: #3D3D3D;
+      --color-muted: #888880;
+      --color-accent: #2D6A4F;
+      --color-accent-light: #D8EAE0;
+      --color-border: #E0DDD5;
+      --font-heading: 'Noto Serif SC', 'Source Han Serif SC', serif;
+      --font-body: 'LXGW WenKai', 'Noto Serif SC', serif;
+    }
+    .dark {
+      --bg-main: #141412;
+      --bg-card: #1E1C19;
+      --bg-hover: #252320;
+      --color-ink: #E8E4D9;
+      --color-body: #C8C4B8;
+      --color-muted: #706A60;
+      --color-accent: #52B788;
+      --color-accent-light: #1A2E24;
+      --color-border: #2A2824;
+    }
+    html { background: var(--bg-main); }
+    body {
+      background: var(--bg-main);
+      color: var(--color-body);
+      font-family: var(--font-body);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .preview-nav { background: rgba(245,242,236,0.92); border-bottom-color: var(--color-border); }
+    .dark .preview-nav { background: rgba(20,20,18,0.92); }
+    .preview-nav .nav-brand, .preview-nav .nav-links a { color: var(--color-muted); }
+    .preview-nav .nav-links a:hover { background: var(--color-ink); color: var(--bg-main); }
+
+    /* ——— Mood Board 主体 ——— */
+    .mb-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 80px 24px 80px;
+    }
+
+    /* 标题区域 */
+    .mb-hero {
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 48px;
+      margin-bottom: 56px;
+    }
+    .mb-tag {
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--color-accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .mb-headline {
+      font-family: var(--font-heading);
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
+      margin-bottom: 16px;
+    }
+    .mb-subline {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--color-muted);
+      max-width: 480px;
+    }
+
+    /* 区块标题 */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* 色板 */
+    .swatch-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .swatch-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .swatch-box {
+      width: 72px; height: 72px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .swatch-info { font-size: 11px; color: var(--color-muted); }
+    .swatch-info strong { display: block; color: var(--color-body); font-size: 12px; }
+
+    /* 字体展示 */
+    .type-demo { margin-bottom: 56px; }
+    .type-row {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .type-specimen {
+      font-family: var(--font-heading);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--color-ink);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .type-specimen.body-sample {
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--color-body);
+      line-height: 1.85;
+    }
+    .type-specimen.caption-sample {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--color-muted);
+      letter-spacing: 0.03em;
+    }
+    .type-meta { font-size: 11px; color: var(--color-muted); letter-spacing: 0.05em; }
+
+    /* 组件展示 */
+    .comp-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; align-items: flex-start; }
+
+    /* 文章卡片 */
+    .article-card {
+      flex: 1; min-width: 260px;
+      background: var(--bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 24px;
+      transition: background 0.2s ease, border-left 0.2s ease;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+    }
+    .article-card:hover {
+      background: var(--bg-hover);
+      border-left-color: var(--color-accent);
+    }
+    .article-card .date {
+      font-size: 12px;
+      color: var(--color-muted);
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+    }
+    .article-card .title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-ink);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .article-card .excerpt {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--color-muted);
+    }
+    .article-card .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--color-accent);
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    /* 按钮 */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-ink);
+      color: var(--bg-main);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: opacity 0.2s ease, transform 0.15s ease;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--color-accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: 1px solid var(--color-accent);
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background 0.2s ease;
+    }
+    .btn-ghost:hover { background: var(--color-accent-light); }
+
+    /* 导航模拟 */
+    .nav-demo {
+      background: var(--bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .nav-brand-demo {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-ink);
+    }
+    .nav-links-demo {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      font-size: 13px;
+    }
+    .nav-links-demo a { color: var(--color-muted); text-decoration: none; }
+    .nav-links-demo a.current { color: var(--color-accent); font-weight: 600; }
+
+    /* 氛围色块 */
+    .vibe-strip {
+      height: 64px;
+      border-radius: 8px;
+      display: flex;
+      overflow: hidden;
+      margin-bottom: 56px;
+    }
+    .vibe-strip div { flex: 1; }
+  </style>
+</head>
+<body>
+  <nav class="preview-nav">
+    <a href="index.html" class="nav-brand">← 返回总览</a>
+    <ul class="nav-links">
+      <li><a href="style-1.html" class="active">方案一</a></li>
+      <li><a href="style-2.html">方案二</a></li>
+      <li><a href="style-3.html">方案三</a></li>
+    </ul>
+    <button class="theme-toggle" aria-label="切换主题"></button>
+  </nav>
+
+  <div class="moodboard-container">
+    <div class="mb-wrap">
+
+      <!-- Hero -->
+      <div class="mb-hero animate-fade-up">
+        <span class="mb-tag">方案一 · Mood Board</span>
+        <h1 class="mb-headline">极简墨笔风</h1>
+        <p class="mb-subline">以东方留白美学驱动的克制内容主义。文字即设计，留白即呼吸。让读者的目光自然停留在内容上。</p>
+      </div>
+
+      <!-- 色彩体系 -->
+      <div class="animate-fade-up">
+        <div class="section-title">色彩体系 · 60-30-10</div>
+        <div class="swatch-group">
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#F5F2EC;"></div>
+            <div class="swatch-info"><strong>60% 主背景</strong>#F5F2EC<br>奶油白</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#1C1C1C;"></div>
+            <div class="swatch-info"><strong>30% 近墨黑</strong>#1C1C1C<br>标题·主文字</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#2D6A4F;"></div>
+            <div class="swatch-info"><strong>10% 森林绿</strong>#2D6A4F<br>强调·链接</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#3D3D3D;"></div>
+            <div class="swatch-info"><strong>正文灰</strong>#3D3D3D<br>正文文字</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#E0DDD5; border: 1px solid #ccc;"></div>
+            <div class="swatch-info"><strong>分割线</strong>#E0DDD5<br>暖灰</div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-box" style="background:#D8EAE0;"></div>
+            <div class="swatch-info"><strong>强调淡色</strong>#D8EAE0<br>hover·标签底</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 氛围色条 -->
+      <div class="vibe-strip animate-fade-up">
+        <div style="background:#F5F2EC;"></div>
+        <div style="background:#EDE9E0;"></div>
+        <div style="background:#E0DDD5;"></div>
+        <div style="background:#3D3D3D;"></div>
+        <div style="background:#1C1C1C;"></div>
+        <div style="background:#2D6A4F;"></div>
+        <div style="background:#52B788;"></div>
+        <div style="background:#D8EAE0;"></div>
+      </div>
+
+      <!-- 字体展示 -->
+      <div class="type-demo animate-fade-up">
+        <div class="section-title">字体系统</div>
+        <div class="type-row">
+          <div class="type-specimen">技术，是一种思维方式</div>
+          <div class="type-meta">思源宋体 · 700 Bold · 36px · 标题层级</div>
+        </div>
+        <div class="type-row">
+          <div class="type-specimen body-sample">在这篇文章里，我想分享一个关于 Node.js 事件循环的深层理解。很多教程告诉你"别阻塞事件循环"，却很少解释为什么这个设计决策在 2009 年如此超前。</div>
+          <div class="type-meta">霞鹜文楷 · 400 Regular · 17px · 正文层级</div>
+        </div>
+        <div class="type-row">
+          <div class="type-specimen caption-sample">2026年4月6日 · 阅读约 8 分钟 · Node.js · 后端</div>
+          <div class="type-meta">霞鹜文楷 · 400 · 12px · 辅助信息</div>
+        </div>
+      </div>
+
+      <!-- 导航组件 -->
+      <div class="animate-fade-up">
+        <div class="section-title">导航组件</div>
+        <div class="nav-demo">
+          <span class="nav-brand-demo">陈明轩的博客</span>
+          <ul class="nav-links-demo">
+            <li><a href="#" class="current">文章</a></li>
+            <li><a href="#">关于我</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 文章卡片组件 -->
+      <div class="animate-fade-up">
+        <div class="section-title">文章卡片（悬停查看交互）</div>
+        <div class="comp-row">
+          <div class="article-card">
+            <div class="date">2026-04-06 · 8 min read</div>
+            <div class="title">深入理解 Node.js 事件循环机制</div>
+            <div class="excerpt">从 libuv 到 V8，拆解 JavaScript 单线程背后真正的异步原理...</div>
+            <div class="read-more">阅读全文 →</div>
+          </div>
+          <div class="article-card">
+            <div class="date">2026-03-28 · 5 min read</div>
+            <div class="title">MySQL 索引优化：你可能忽视的三个细节</div>
+            <div class="excerpt">覆盖索引、最左前缀原则和索引下推，三个改变性能的关键认知...</div>
+            <div class="read-more">阅读全文 →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 按钮 -->
+      <div class="animate-fade-up">
+        <div class="section-title">交互元素</div>
+        <div class="comp-row" style="align-items:center;">
+          <button class="btn-primary">发布文章</button>
+          <button class="btn-ghost">查看更多</button>
+          <span style="font-size:13px; color:var(--color-muted); border-bottom:1px solid var(--color-accent); padding-bottom:2px; color:var(--color-accent);">文字链接样式</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="components.js"></script>
+</body>
+</html>

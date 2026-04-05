@@ -1,0 +1,20 @@
+<%
+  var _profile = typeof profile !== 'undefined' && profile ? profile : {
+    name: '我的博客',
+    tagline: '记录思考，分享所得',
+    socialLinks: [],
+    get copyrightYear() { return new Date().getFullYear(); }
+  };
+%>
+<%- include('../layouts/_header', { profile: _profile, title: '服务器错误' }) %>
+
+    <div class="error-page container">
+      <div class="error-content">
+        <p class="error-code">500</p>
+        <h1 class="error-title">服务器开了个小差</h1>
+        <p class="error-desc">内部错误，请稍后再试。如问题持续存在，请联系博主。</p>
+        <a href="/" class="btn btn-primary">返回首页</a>
+      </div>
+    </div>
+
+<%- include('../layouts/_footer', { profile: _profile }) %>

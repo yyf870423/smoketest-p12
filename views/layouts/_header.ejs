@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' — ' : '' %><%= profile ? profile.name : '我的博客' %></title>
+  <meta name="description" content="<%= profile ? profile.tagline : '个人博客' %>">
+  <!-- 字体：Noto Serif SC（标题）、LXGW WenKai（正文）、JetBrains Mono（代码）、Playfair Display（拉丁） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- 阅读进度条 -->
+  <div id="progress-bar" class="progress-bar"></div>
+
+  <!-- 顶部导航 -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="site-logo">
+        <% if (profile && profile.name) { %>
+          <%= profile.name %>
+        <% } else { %>
+          我的博客
+        <% } %>
+      </a>
+      <nav class="site-nav">
+        <a href="/" class="nav-link">文章</a>
+        <a href="/about" class="nav-link">关于</a>
+      </nav>
+      <!-- 移动端菜单按钮 -->
+      <button class="nav-toggle" id="nav-toggle" aria-label="切换菜单" aria-expanded="false">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+    </div>
+    <!-- 移动端展开菜单 -->
+    <div class="nav-mobile" id="nav-mobile">
+      <a href="/" class="nav-link">文章</a>
+      <a href="/about" class="nav-link">关于</a>
+    </div>
+  </header>
+
+  <main class="site-main">

@@ -1,0 +1,68 @@
+<%- include('../layouts/_header') %>
+
+<div class="container front-index">
+
+  <!-- 页面标题区域 -->
+  <section class="page-hero">
+    <h1 class="page-hero-title"><%= profile.name %></h1>
+    <p class="page-hero-sub"><%= profile.tagline %></p>
+  </section>
+
+  <!-- 文章列表 -->
+  <% if (articles && articles.length > 0) { %>
+    <ol class="article-list" reversed>
+      <% articles.forEach(function(article) { %>
+        <li class="article-card">
+          <a href="/article/<%= article.id %>" class="article-card-link">
+            <div class="article-card-body">
+              <h2 class="article-card-title"><%= article.title %></h2>
+              <% if (article.summary) { %>
+                <p class="article-card-summary"><%= article.summary %></p>
+              <% } %>
+              <div class="article-card-meta">
+                <time class="article-card-date" datetime="<%= article.published_at ? new Date(article.published_at).toISOString() : '' %>">
+                  <%= article.published_at ? new Date(article.published_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) : '' %>
+                </time>
+                <% if (article.tags) { %>
+                  <span class="article-card-tags">
+                    <% article.tags.split(',').forEach(function(tag) { tag = tag.trim(); if (tag) { %>
+                      <span class="tag"><%= tag %></span>
+                    <% } }); %>
+                  </span>
+                <% } %>
+              </div>
+            </div>
+            <span class="article-card-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      <% }); %>
+    </ol>
+
+    <!-- 分页 -->
+    <% if (totalPages > 1) { %>
+      <nav class="pagination" aria-label="分页导航">
+        <% if (currentPage > 1) { %>
+          <a href="/?page=<%= currentPage - 1 %>" class="pagination-btn pagination-prev">← 较新文章</a>
+        <% } else { %>
+          <span class="pagination-btn pagination-prev is-disabled">← 较新文章</span>
+        <% } %>
+
+        <span class="pagination-info">第 <%= currentPage %> / <%= totalPages %> 页</span>
+
+        <% if (currentPage < totalPages) { %>
+          <a href="/?page=<%= currentPage + 1 %>" class="pagination-btn pagination-next">较旧文章 →</a>
+        <% } else { %>
+          <span class="pagination-btn pagination-next is-disabled">较旧文章 →</span>
+        <% } %>
+      </nav>
+    <% } %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <p class="empty-state-text">暂无文章，敬请期待。</p>
+    </div>
+  <% } %>
+
+</div>
+
+<%- include('../layouts/_footer') %>

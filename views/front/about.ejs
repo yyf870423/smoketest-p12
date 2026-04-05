@@ -1,0 +1,44 @@
+<%- include('../layouts/_header') %>
+
+<div class="container front-about">
+
+  <section class="about-section">
+
+    <!-- 头像 + 名称 -->
+    <div class="about-profile">
+      <div class="about-avatar-wrap">
+        <img
+          src="<%= profile.avatar %>"
+          alt="<%= profile.name %> 的头像"
+          class="about-avatar"
+          onerror="this.src='/images/avatar-fallback.svg'"
+        >
+      </div>
+      <div class="about-info">
+        <h1 class="about-name"><%= profile.name %></h1>
+        <p class="about-tagline"><%= profile.tagline %></p>
+        <!-- 社交链接 -->
+        <% if (profile.socialLinks && profile.socialLinks.length) { %>
+          <div class="about-social">
+            <% profile.socialLinks.forEach(function(link) { %>
+              <a href="<%= link.url %>" class="about-social-link" target="_blank" rel="noopener noreferrer">
+                <%= link.label %>
+              </a>
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- 个人简介正文 -->
+    <div class="about-bio prose">
+      <% profile.bio.split('\n').forEach(function(para) { if (para.trim()) { %>
+        <p><%= para.trim() %></p>
+      <% } }); %>
+    </div>
+
+  </section>
+
+</div>
+
+<%- include('../layouts/_footer') %>

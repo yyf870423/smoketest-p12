@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于 — 个人简介</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ── 个人简介页专属样式 ── */
+    .about-hero {
+      padding: var(--space-16) 0 var(--space-12);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -80px;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, var(--color-accent-muted) 0%, transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .about-hero-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: var(--space-12);
+      align-items: start;
+    }
+    .avatar-column {
+      position: sticky;
+      top: calc(var(--header-h) + var(--space-8));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5);
+      animation: fadeUp 0.6s ease-out both;
+    }
+    .avatar-frame {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--color-border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .avatar-frame:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(45,106,79,0.15);
+    }
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--color-accent-muted), var(--color-surface-overlay));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      color: var(--color-accent);
+    }
+    .avatar-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+    .avatar-tagline {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .social-links {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      background: var(--color-surface-primary);
+    }
+    .social-link:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45,106,79,0.12);
+    }
+    .divider-ink {
+      width: 40px;
+      height: 2px;
+      background: var(--color-accent);
+      margin: var(--space-4) auto;
+      border-radius: 1px;
+    }
+    /* ── 内容列 ── */
+    .content-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-10);
+    }
+    .section-block {
+      animation: fadeUp 0.6s ease-out both;
+    }
+    .section-block:nth-child(1) { animation-delay: 0.2s; }
+    .section-block:nth-child(2) { animation-delay: 0.35s; }
+    .section-block:nth-child(3) { animation-delay: 0.5s; }
+    .section-block:nth-child(4) { animation-delay: 0.65s; }
+    .section-label {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-3);
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+      margin-bottom: var(--space-5);
+    }
+    .section-body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: 1.9;
+    }
+    .section-body p + p {
+      margin-top: var(--space-4);
+    }
+    /* ── 技能标签 ── */
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+    }
+    .skill-tag {
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-surface-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      transition: all 0.2s ease;
+    }
+    .skill-tag:hover {
+      background: var(--color-accent-muted);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .skill-tag.primary {
+      background: var(--color-accent-muted);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    /* ── 时间线 ── */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: var(--space-4);
+    }
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: var(--space-5);
+      position: relative;
+      padding-bottom: var(--space-6);
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 108px;
+      top: 8px;
+      bottom: 0;
+      width: 1px;
+      background: var(--color-border);
+    }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      padding-top: 2px;
+      text-align: right;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: 104px;
+      top: 6px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: 2px solid var(--color-surface-primary);
+      box-shadow: 0 0 0 2px var(--color-accent-muted);
+    }
+    .timeline-content h4 {
+      font-family: var(--font-heading);
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .timeline-content p {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+    /* ── 精选文章 ── */
+    .featured-articles {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+    .featured-article-card {
+      display: grid;
+      grid-template-columns: 4px 1fr;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface-secondary);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: all 0.25s ease;
+      overflow: hidden;
+      position: relative;
+    }
+    .featured-article-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--color-accent);
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+    }
+    .featured-article-card:hover {
+      background: var(--color-accent-muted);
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(45,106,79,0.1);
+    }
+    .featured-card-inner {
+      padding-left: var(--space-2);
+    }
+    .featured-card-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-1);
+      line-height: 1.4;
+    }
+    .featured-card-meta {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+    /* ── 联系区块 ── */
+    .contact-block {
+      padding: var(--space-8);
+      background: var(--color-surface-secondary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-block::after {
+      content: '✉';
+      position: absolute;
+      right: var(--space-8);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 64px;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+      padding: var(--space-3) var(--space-6);
+      background: var(--color-accent);
+      color: var(--color-text-inverse);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .contact-email:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45,106,79,0.25);
+    }
+
+    /* ── 响应式 ── */
+    @media (max-width: 768px) {
+      .about-hero-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+      }
+      .avatar-column {
+        position: static;
+      }
+      .timeline-item {
+        grid-template-columns: 70px 1fr;
+      }
+      .timeline-item::before { left: 78px; }
+      .timeline-dot { left: 74px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-cn">墨迹</span>
+        <span class="logo-en">Blog</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">文章</a>
+        <a href="about.html" class="nav-link active">关于</a>
+        <a href="admin-login.html" class="nav-link nav-link-subtle">后台</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="ThemeManager.toggle()" title="切换主题">
+          <span class="theme-icon">☀</span>
+        </button>
+        <button class="mobile-menu-btn" onclick="NavManager.toggleMobile()" aria-label="菜单">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <!-- 移动端菜单 -->
+    <div class="mobile-nav" id="mobileNav">
+      <a href="index.html" class="mobile-nav-link">文章</a>
+      <a href="about.html" class="mobile-nav-link active">关于</a>
+      <a href="admin-login.html" class="mobile-nav-link">后台</a>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <main>
+    <section class="about-hero">
+      <div class="about-hero-inner">
+
+        <!-- 头像列（粘性） -->
+        <aside class="avatar-column">
+          <div class="avatar-frame">
+            <div class="avatar-placeholder">🖋</div>
+          </div>
+          <div class="avatar-name">张 明远</div>
+          <div class="avatar-tagline">独立开发者 · 技术写作者<br>爱好摄影与长距离骑行</div>
+          <div class="divider-ink"></div>
+          <div class="social-links">
+            <a href="#" class="social-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013.01-.4c1.02 0 2.05.14 3.01.4 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            <a href="#" class="social-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 01-1.93.07 4.28 4.28 0 004 2.98 8.521 8.521 0 01-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg>
+              Twitter
+            </a>
+            <a href="#" class="social-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              邮件
+            </a>
+          </div>
+        </aside>
+
+        <!-- 内容列 -->
+        <div class="content-column">
+
+          <!-- 自我介绍 -->
+          <section class="section-block">
+            <div class="section-label">Hello, World</div>
+            <h1 class="section-title">我是一位热爱写作<br>的独立开发者</h1>
+            <div class="section-body">
+              <p>我在互联网行业工作了十余年，写代码，也写文字。这个博客是我思考的容器——记录技术探索的心路，记录生活中值得珍藏的瞬间，偶尔也聊聊对世界的一些看法。</p>
+              <p>我相信写作是最好的思考方式。把脑海中模糊的想法写成文字，是一个强迫自己搞清楚问题的过程。所以这个博客既是写给读者的，更是写给自己的。</p>
+              <p>如果你正在读这篇文字，欢迎你的到来。希望这里的内容能带给你一点启发，或者只是片刻的宁静。</p>
+            </div>
+          </section>
+
+          <!-- 技能领域 -->
+          <section class="section-block">
+            <div class="section-label">技术栈 & 兴趣</div>
+            <h2 class="section-title" style="font-size: var(--text-xl);">我做什么</h2>
+            <div class="section-body">
+              <p>主要从事后端开发工作，近年来越来越多地关注系统设计与工程效率。业余时间折腾各种有趣的工具和框架。</p>
+            </div>
+            <div class="skill-tags">
+              <span class="skill-tag primary">Node.js</span>
+              <span class="skill-tag primary">TypeScript</span>
+              <span class="skill-tag primary">系统设计</span>
+              <span class="skill-tag">React</span>
+              <span class="skill-tag">MySQL</span>
+              <span class="skill-tag">Redis</span>
+              <span class="skill-tag">Docker</span>
+              <span class="skill-tag">Kubernetes</span>
+              <span class="skill-tag">云原生</span>
+              <span class="skill-tag">技术写作</span>
+              <span class="skill-tag">摄影</span>
+              <span class="skill-tag">骑行</span>
+            </div>
+          </section>
+
+          <!-- 经历时间线 -->
+          <section class="section-block">
+            <div class="section-label">经历</div>
+            <h2 class="section-title" style="font-size: var(--text-xl);">走过的路</h2>
+            <div class="timeline">
+              <div class="timeline-item">
+                <span class="timeline-year">2022—</span>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <h4>独立开发者 · 自由撰稿人</h4>
+                  <p>离开大公司，开始自由职业。维护多个开源项目，为技术媒体撰稿，同时为初创公司提供技术顾问服务。</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <span class="timeline-year">2019–22</span>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <h4>高级后端工程师 · 某互联网公司</h4>
+                  <p>负责核心交易系统架构设计与优化，带领团队完成从单体到微服务的迁移，日均处理 1000 万级请求。</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <span class="timeline-year">2015–19</span>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <h4>后端工程师 · 创业公司</h4>
+                  <p>初创团队，从 0 到 1 构建产品。这段经历让我深刻理解工程与业务的平衡。</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <span class="timeline-year">2011–15</span>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <h4>计算机科学学士 · 某重点高校</h4>
+                  <p>系统学习计算机基础，在此期间开始接触开源社区，写下第一篇技术博客。</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 精选文章 -->
+          <section class="section-block">
+            <div class="section-label">精选文章</div>
+            <h2 class="section-title" style="font-size: var(--text-xl);">值得一读</h2>
+            <div class="featured-articles">
+              <a href="article.html" class="featured-article-card">
+                <div></div>
+                <div class="featured-card-inner">
+                  <div class="featured-card-title">深入理解 Node.js 事件循环：从理论到实践</div>
+                  <div class="featured-card-meta">2024-03-15 · 技术</div>
+                </div>
+              </a>
+              <a href="article.html" class="featured-article-card">
+                <div></div>
+                <div class="featured-card-inner">
+                  <div class="featured-card-title">为什么你应该开始写技术博客</div>
+                  <div class="featured-card-meta">2024-02-28 · 随笔</div>
+                </div>
+              </a>
+              <a href="article.html" class="featured-article-card">
+                <div></div>
+                <div class="featured-card-inner">
+                  <div class="featured-card-title">微服务架构的代价：我踩过的那些坑</div>
+                  <div class="featured-card-meta">2024-01-10 · 技术</div>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <!-- 联系方式 -->
+          <section class="section-block">
+            <div class="contact-block">
+              <div class="section-label" style="margin-bottom: var(--space-2);">联系我</div>
+              <h2 class="section-title" style="font-size: var(--text-xl); margin-bottom: var(--space-2);">有话想说？</h2>
+              <p style="font-family: var(--font-body); color: var(--color-text-secondary); font-size: var(--text-sm);">
+                无论是技术探讨、合作机会，还是单纯想打个招呼，我都很欢迎。
+              </p>
+              <a href="mailto:hello@example.com" class="contact-email">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                hello@example.com
+              </a>
+            </div>
+          </section>
+
+        </div><!-- /content-column -->
+      </div><!-- /about-hero-inner -->
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-cn">墨迹</span>
+        <span class="footer-sep">·</span>
+        <span class="footer-copy">© 2024 保留所有权利</span>
+      </div>
+      <nav class="footer-links">
+        <a href="index.html" class="footer-link">文章</a>
+        <a href="about.html" class="footer-link">关于</a>
+        <a href="#" class="footer-link">RSS</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="components.js"></script>
+</body>
+</html>

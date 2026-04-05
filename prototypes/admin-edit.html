@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑文章 — 后台</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ── 复用 admin 布局变量 ── */
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+
+    .admin-layout { display: flex; flex: 1; min-height: 100vh; }
+
+    /* ── 侧边栏（复用同款） ── */
+    .admin-sidebar {
+      width: 240px;
+      background: var(--color-surface-secondary);
+      border-right: 1px solid var(--color-border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .sidebar-brand { padding: var(--space-6) var(--space-5) var(--space-5); border-bottom: 1px solid var(--color-border); }
+    .sidebar-brand .logo-cn { font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: var(--color-text-primary); display: block; }
+    .sidebar-brand .logo-sub { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-body); letter-spacing: 0.1em; }
+    .sidebar-nav { flex: 1; padding: var(--space-4) 0; }
+    .sidebar-nav-section { padding: var(--space-3) var(--space-5) var(--space-2); font-size: 10px; font-family: var(--font-body); color: var(--color-text-muted); letter-spacing: 0.15em; text-transform: uppercase; }
+    .sidebar-nav-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-5); font-family: var(--font-body); font-size: 14px; color: var(--color-text-secondary); text-decoration: none; border-left: 2px solid transparent; transition: all 0.2s; }
+    .sidebar-nav-item:hover { color: var(--color-text-primary); background: var(--color-surface-overlay); }
+    .sidebar-nav-item.active { color: var(--color-accent); border-left-color: var(--color-accent); background: var(--color-accent-muted); font-weight: 600; }
+    .sidebar-nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: var(--space-4) var(--space-5); border-top: 1px solid var(--color-border); }
+    .user-info { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent); color: white; display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 14px; font-weight: 700; }
+    .user-name { font-size: 13px; font-family: var(--font-body); font-weight: 600; color: var(--color-text-primary); }
+    .user-role { font-size: 11px; color: var(--color-text-muted); }
+    .btn-logout { width: 100%; padding: var(--space-2) var(--space-4); background: none; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-body); font-size: 13px; color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; }
+    .btn-logout:hover { border-color: var(--color-error); color: var(--color-error); }
+
+    /* ── 主区域 ── */
+    .admin-main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; }
+    .admin-topbar { height: 56px; background: var(--color-surface-primary); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-8); position: sticky; top: 0; z-index: 50; }
+    .topbar-breadcrumb { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--color-text-muted); font-family: var(--font-body); }
+    .topbar-breadcrumb span.sep { color: var(--color-border-strong); }
+    .topbar-breadcrumb .current { color: var(--color-text-primary); }
+    .topbar-actions { display: flex; align-items: center; gap: var(--space-3); }
+
+    /* ── 编辑器布局 ── */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: var(--space-6);
+      padding: var(--space-6) var(--space-8);
+      flex: 1;
+      animation: fadeIn 0.4s ease both;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── 主编辑区 ── */
+    .editor-main { display: flex; flex-direction: column; gap: var(--space-5); }
+
+    .editor-card {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    /* 标题输入 */
+    .title-input {
+      width: 100%;
+      padding: var(--space-5) var(--space-6);
+      font-family: var(--font-heading);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      line-height: 1.3;
+      box-sizing: border-box;
+    }
+    .title-input::placeholder { color: var(--color-text-muted); }
+
+    /* 编辑器工具栏 */
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: var(--space-2) var(--space-4);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-secondary);
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      min-width: 30px; height: 28px;
+      padding: 0 var(--space-2);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .toolbar-btn:hover { background: var(--color-surface-overlay); border-color: var(--color-border); color: var(--color-text-primary); }
+    .toolbar-btn.active { background: var(--color-accent-muted); border-color: rgba(45,106,79,0.2); color: var(--color-accent); }
+    .toolbar-divider { width: 1px; height: 20px; background: var(--color-border); margin: 0 var(--space-2); }
+
+    /* Markdown 编辑区（模拟） */
+    .editor-textarea {
+      width: 100%;
+      min-height: 400px;
+      padding: var(--space-6);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--color-text-primary);
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .editor-textarea::placeholder { color: var(--color-text-muted); }
+
+    /* 字数统计 */
+    .editor-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: var(--space-2) var(--space-5);
+      border-top: 1px solid var(--color-border);
+      font-size: 12px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+      background: var(--color-surface-secondary);
+    }
+
+    /* ── 右侧面板 ── */
+    .editor-sidebar { display: flex; flex-direction: column; gap: var(--space-5); }
+
+    .panel-card {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-surface-secondary);
+      border-bottom: 1px solid var(--color-border);
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: 0.05em;
+    }
+    .panel-body { padding: var(--space-4) var(--space-5); }
+
+    /* 发布按钮区 */
+    .publish-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+    .btn-publish {
+      width: 100%;
+      padding: var(--space-3);
+      background: var(--color-accent);
+      color: white;
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .btn-publish:hover { background: var(--color-accent-hover); box-shadow: 0 4px 12px rgba(45,106,79,0.3); }
+    .btn-publish:active { transform: scale(0.98); }
+    .btn-save-draft {
+      width: 100%;
+      padding: var(--space-3);
+      background: none;
+      color: var(--color-text-secondary);
+      font-family: var(--font-body);
+      font-size: 13px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-save-draft:hover { border-color: var(--color-border-strong); color: var(--color-text-primary); }
+
+    .save-status {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+      text-align: center;
+      margin-top: var(--space-2);
+    }
+    .save-status.saving { color: var(--color-warning); }
+    .save-status.saved  { color: var(--color-success); }
+
+    /* 表单元素 */
+    .form-row { margin-bottom: var(--space-4); }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-label { display: block; font-size: 12px; font-family: var(--font-body); color: var(--color-text-muted); letter-spacing: 0.05em; margin-bottom: var(--space-2); text-transform: uppercase; }
+    .form-control {
+      width: 100%;
+      padding: var(--space-2) var(--space-3);
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-primary);
+      background: var(--color-surface-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-control:focus { border-color: var(--color-accent); box-shadow: 0 0 0 2px rgba(45,106,79,0.10); }
+    .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%239A9590'%3E%3Cpath d='M0 0l6 8 6-8z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+
+    /* 标签输入 */
+    .tags-input-wrapper {
+      display: flex; flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: border-color 0.2s;
+      cursor: text;
+    }
+    .tags-input-wrapper:focus-within { border-color: var(--color-accent); box-shadow: 0 0 0 2px rgba(45,106,79,0.10); }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px;
+      background: var(--color-accent-muted);
+      color: var(--color-accent);
+      border-radius: var(--radius-full);
+      font-size: 11px; font-family: var(--font-body);
+    }
+    .tag-remove { cursor: pointer; opacity: 0.6; transition: opacity 0.15s; background: none; border: none; color: inherit; padding: 0; font-size: 13px; line-height: 1; }
+    .tag-remove:hover { opacity: 1; }
+    .tag-text-input { border: none; outline: none; background: none; font-family: var(--font-body); font-size: 13px; color: var(--color-text-primary); min-width: 80px; flex: 1; }
+
+    /* 封面图上传 */
+    .cover-upload {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--color-surface-secondary);
+    }
+    .cover-upload:hover { border-color: var(--color-accent); background: var(--color-accent-muted); }
+    .cover-upload-icon { font-size: 24px; margin-bottom: var(--space-2); }
+    .cover-upload-text { font-size: 12px; color: var(--color-text-muted); font-family: var(--font-body); }
+    .cover-upload-text strong { color: var(--color-accent); }
+
+    /* 预览提示 */
+    .preview-tip {
+      padding: var(--space-3);
+      background: var(--color-accent-muted);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: var(--color-accent);
+      font-family: var(--font-body);
+      display: flex; gap: var(--space-2); align-items: flex-start;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: var(--space-8);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--color-text-primary);
+      color: var(--color-text-inverse);
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 14px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── 响应式 ── */
+    @media (max-width: 1024px) {
+      .editor-layout { grid-template-columns: 1fr; padding: var(--space-4); }
+      .editor-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.open { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+      .editor-layout { padding: var(--space-4) var(--space-4); }
+      .editor-sidebar { grid-template-columns: 1fr; }
+    }
+
+    [data-theme="dark"] .admin-topbar,
+    [data-theme="dark"] .editor-card,
+    [data-theme="dark"] .panel-card {
+      background: var(--color-surface-secondary);
+    }
+    [data-theme="dark"] .editor-textarea,
+    [data-theme="dark"] .title-input {
+      color: var(--color-text-primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <!-- ── 侧边栏 ── -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <span class="logo-cn">墨迹后台</span>
+      <span class="logo-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">内容</div>
+      <a href="admin-articles.html" class="sidebar-nav-item">
+        <span class="nav-icon">📄</span>文章管理
+      </a>
+      <a href="admin-edit.html" class="sidebar-nav-item active">
+        <span class="nav-icon">✏️</span>写新文章
+      </a>
+      <div class="sidebar-nav-section">账户</div>
+      <a href="#" class="sidebar-nav-item">
+        <span class="nav-icon">👤</span>个人设置
+      </a>
+      <div class="sidebar-nav-section">站点</div>
+      <a href="index.html" target="_blank" class="sidebar-nav-item">
+        <span class="nav-icon">🌐</span>查看博客
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">超级管理员</div>
+        </div>
+        <button class="theme-toggle" onclick="ThemeManager.toggle()" style="margin-left:auto;" title="切换主题">
+          <span class="theme-icon">☾</span>
+        </button>
+      </div>
+      <button class="btn-logout" onclick="if(confirm('确定退出？'))location.href='admin-login.html'">退出登录</button>
+    </div>
+  </aside>
+
+  <!-- ── 主内容 ── -->
+  <div class="admin-main">
+    <!-- 顶部工具栏 -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-4)">
+        <button class="hamburger" id="sidebarToggle" style="display:none;" aria-label="菜单">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-breadcrumb">
+          <a href="admin-articles.html" style="color:var(--color-text-muted);text-decoration:none;">文章管理</a>
+          <span class="sep">/</span>
+          <span class="current" id="pageTitle">写新文章</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-save-draft" onclick="saveDraft()" style="width:auto;padding:6px 14px;font-size:13px;">
+          保存草稿
+        </button>
+        <button class="btn-publish" onclick="publishArticle()" style="width:auto;padding:6px 16px;font-size:13px;">
+          发布文章
+        </button>
+      </div>
+    </header>
+
+    <!-- 编辑器主区 -->
+    <div class="editor-layout">
+      <!-- 左侧编辑区 -->
+      <div class="editor-main">
+        <!-- 标题 -->
+        <div class="editor-card">
+          <textarea
+            class="title-input"
+            id="titleInput"
+            placeholder="请输入文章标题…"
+            rows="2"
+            oninput="autoSaveIndicator(); updateWordCount()"
+          ></textarea>
+        </div>
+
+        <!-- Markdown 编辑器 -->
+        <div class="editor-card">
+          <!-- 工具栏 -->
+          <div class="editor-toolbar">
+            <button class="toolbar-btn" onclick="insertMd('**','**')" title="粗体"><strong>B</strong></button>
+            <button class="toolbar-btn" onclick="insertMd('*','*')" title="斜体"><em>I</em></button>
+            <button class="toolbar-btn" onclick="insertMd('~~','~~')" title="删除线">~~</button>
+            <button class="toolbar-btn" onclick="insertMd('`','`')" title="行内代码">⌥</button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" onclick="insertMdLine('## ')" title="标题 H2">H2</button>
+            <button class="toolbar-btn" onclick="insertMdLine('### ')" title="标题 H3">H3</button>
+            <button class="toolbar-btn" onclick="insertMdLine('> ')" title="引用">❝</button>
+            <button class="toolbar-btn" onclick="insertMdLine('- ')" title="无序列表">•–</button>
+            <button class="toolbar-btn" onclick="insertMdLine('1. ')" title="有序列表">1.</button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" onclick="insertMd('\n```\n','\n```')" title="代码块">{}</button>
+            <button class="toolbar-btn" onclick="insertMd('[','](url)')" title="链接">🔗</button>
+            <button class="toolbar-btn" onclick="insertMd('![alt](',')')" title="图片">🖼</button>
+            <button class="toolbar-btn" onclick="insertMdLine('---')" title="分割线">——</button>
+          </div>
+
+          <!-- 正文编辑区 -->
+          <textarea
+            class="editor-textarea"
+            id="contentTextarea"
+            placeholder="开始写作…
+
+支持 Markdown 语法。例如：
+# 大标题
+## 小标题
+**粗体** *斜体* ~~删除线~~
+> 引用块
+```代码块```
+
+---"
+            oninput="autoSaveIndicator(); updateWordCount()"
+          ></textarea>
+
+          <div class="editor-footer">
+            <span id="wordCount">0 字</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧属性面板 -->
+      <div class="editor-sidebar">
+        <!-- 发布 -->
+        <div class="panel-card">
+          <div class="panel-header">发布设置</div>
+          <div class="panel-body">
+            <div class="publish-actions">
+              <button class="btn-publish" onclick="publishArticle()">🚀 发布文章</button>
+              <button class="btn-save-draft" onclick="saveDraft()">💾 保存草稿</button>
+            </div>
+            <div class="save-status" id="saveStatus">所有更改已保存</div>
+          </div>
+        </div>
+
+        <!-- 文章属性 -->
+        <div class="panel-card">
+          <div class="panel-header">文章属性</div>
+          <div class="panel-body">
+            <div class="form-row">
+              <label class="form-label">分类</label>
+              <select class="form-control form-select" id="categorySelect">
+                <option value="">选择分类</option>
+                <option value="tech">技术</option>
+                <option value="life">生活</option>
+                <option value="essay">随笔</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">摘要</label>
+              <textarea
+                class="form-control"
+                id="excerptInput"
+                placeholder="简短描述这篇文章…"
+                rows="3"
+                style="resize:vertical;"
+              ></textarea>
+            </div>
+            <div class="form-row">
+              <label class="form-label">标签</label>
+              <div class="tags-input-wrapper" id="tagsWrapper" onclick="document.getElementById('tagInput').focus()">
+                <span class="tag-chip">Node.js <button class="tag-remove" onclick="removeTag(this)">×</button></span>
+                <span class="tag-chip">博客 <button class="tag-remove" onclick="removeTag(this)">×</button></span>
+                <input
+                  class="tag-text-input"
+                  id="tagInput"
+                  placeholder="输入后按回车添加…"
+                  onkeydown="handleTagInput(event)"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 封面图 -->
+        <div class="panel-card">
+          <div class="panel-header">封面图</div>
+          <div class="panel-body">
+            <div class="cover-upload" id="coverUpload" onclick="document.getElementById('coverFileInput').click()">
+              <div class="cover-upload-icon">🖼</div>
+              <div class="cover-upload-text"><strong>点击上传</strong>或拖拽图片</div>
+              <div class="cover-upload-text" style="margin-top:4px;">JPG / PNG，建议 1200×630</div>
+            </div>
+            <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="previewCover(this)">
+          </div>
+        </div>
+
+        <!-- 预览提示 -->
+        <div class="preview-tip">
+          <span>💡</span>
+          <span>点击右上角「发布文章」后，可在文章列表页点击「预览」查看最终效果。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="components.js"></script>
+<script>
+  // ── 初始化（如有 id 参数，模拟加载文章数据）
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('id');
+  if (editId) {
+    document.getElementById('pageTitle').textContent = '编辑文章';
+    document.getElementById('titleInput').value = 'MySQL 索引优化实战笔记';
+    document.getElementById('contentTextarea').value = `## 前言\n\n最近在生产环境中遇到了一个令人头疼的慢查询问题…\n\n## 问题定位\n\n使用 \`EXPLAIN\` 分析执行计划：\n\n\`\`\`sql\nEXPLAIN SELECT * FROM articles WHERE status = 'published' ORDER BY created_at DESC;\n\`\`\`\n\n## 解决方案\n\n添加复合索引后，查询时间从 2.3s 降至 12ms。`;
+    document.getElementById('excerptInput').value = '记录生产环境中遭遇的慢查询和优化方案，包含 EXPLAIN 分析和索引设计思路。';
+    updateWordCount();
+  }
+
+  // ── Markdown 插入辅助
+  function insertMd(before, after) {
+    const ta = document.getElementById('contentTextarea');
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const selected = ta.value.substring(start, end);
+    const replacement = before + (selected || '内容') + after;
+    ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
+    ta.focus();
+    ta.setSelectionRange(start + before.length, start + before.length + (selected || '内容').length);
+    updateWordCount();
+  }
+  function insertMdLine(prefix) {
+    const ta = document.getElementById('contentTextarea');
+    const start = ta.selectionStart;
+    const lineStart = ta.value.lastIndexOf('\n', start - 1) + 1;
+    ta.value = ta.value.substring(0, lineStart) + prefix + ta.value.substring(lineStart);
+    ta.focus();
+    updateWordCount();
+  }
+
+  // ── 字数统计
+  function updateWordCount() {
+    const content = document.getElementById('contentTextarea').value;
+    const title = document.getElementById('titleInput').value;
+    const count = (content + title).replace(/\s/g, '').length;
+    document.getElementById('wordCount').textContent = count + ' 字';
+  }
+
+  // ── 自动保存指示
+  let autoSaveTimer;
+  function autoSaveIndicator() {
+    const status = document.getElementById('saveStatus');
+    clearTimeout(autoSaveTimer);
+    status.className = 'save-status saving';
+    status.textContent = '正在保存…';
+    autoSaveTimer = setTimeout(() => {
+      status.className = 'save-status saved';
+      status.textContent = '✓ 草稿已自动保存';
+      setTimeout(() => {
+        status.className = 'save-status';
+        status.textContent = '所有更改已保存';
+      }, 2000);
+    }, 1200);
+  }
+
+  // ── 标签管理
+  function handleTagInput(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const input = document.getElementById('tagInput');
+      const val = input.value.trim().replace(/,$/, '');
+      if (!val) return;
+      const chip = document.createElement('span');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `${val} <button class="tag-remove" onclick="removeTag(this)">×</button>`;
+      document.getElementById('tagsWrapper').insertBefore(chip, input);
+      input.value = '';
+    }
+    if (e.key === 'Backspace' && !document.getElementById('tagInput').value) {
+      const chips = document.querySelectorAll('.tag-chip');
+      if (chips.length) chips[chips.length - 1].remove();
+    }
+  }
+  function removeTag(btn) { btn.closest('.tag-chip').remove(); }
+
+  // ── 封面预览
+  function previewCover(input) {
+    if (!input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const upload = document.getElementById('coverUpload');
+      upload.style.backgroundImage = `url(${e.target.result})`;
+      upload.style.backgroundSize = 'cover';
+      upload.style.backgroundPosition = 'center';
+      upload.style.minHeight = '120px';
+      upload.innerHTML = '<div style="background:rgba(0,0,0,0.4);padding:8px 12px;border-radius:4px;color:white;font-size:12px;">点击更换封面</div>';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+  // ── 保存草稿
+  function saveDraft() {
+    const title = document.getElementById('titleInput').value.trim();
+    if (!title) { showToast('请先输入文章标题'); return; }
+    showToast('草稿已保存 ✓');
+    document.getElementById('saveStatus').className = 'save-status saved';
+    document.getElementById('saveStatus').textContent = '✓ 草稿已保存';
+  }
+
+  // ── 发布
+  function publishArticle() {
+    const title = document.getElementById('titleInput').value.trim();
+    const content = document.getElementById('contentTextarea').value.trim();
+    if (!title) { showToast('请先输入文章标题'); return; }
+    if (!content) { showToast('文章内容不能为空'); return; }
+    showToast('文章发布成功！正在跳转…');
+    setTimeout(() => window.location.href = 'admin-articles.html', 1500);
+  }
+
+  // ── Toast
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // 侧边栏响应式
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  if (window.innerWidth <= 768) sidebarToggle.style.display = 'flex';
+  sidebarToggle.addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.toggle('open');
+  });
+</script>
+</body>
+</html>
