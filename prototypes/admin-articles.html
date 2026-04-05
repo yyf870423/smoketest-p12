@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章管理 — 后台</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* ── 后台整体布局 ── */
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+
+    .admin-layout {
+      display: flex;
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* ── 侧边栏 ── */
+    .admin-sidebar {
+      width: 240px;
+      background: var(--color-surface-secondary);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .sidebar-brand {
+      padding: var(--space-6) var(--space-5) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sidebar-brand .logo-cn {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      display: block;
+    }
+    .sidebar-brand .logo-sub {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+      letter-spacing: 0.1em;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-4) 0;
+    }
+    .sidebar-nav-section {
+      padding: var(--space-3) var(--space-5) var(--space-2);
+      font-size: 10px;
+      font-family: var(--font-body);
+      color: var(--color-text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .sidebar-nav-item:hover {
+      color: var(--color-text-primary);
+      background: var(--color-surface-overlay);
+    }
+    .sidebar-nav-item.active {
+      color: var(--color-accent);
+      border-left-color: var(--color-accent);
+      background: var(--color-accent-muted);
+      font-weight: 600;
+    }
+    .sidebar-nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-nav-item .nav-badge {
+      margin-left: auto;
+      background: var(--color-accent);
+      color: white;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+    }
+
+    .sidebar-footer {
+      padding: var(--space-4) var(--space-5);
+      border-top: 1px solid var(--color-border);
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .user-name {
+      font-size: 13px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .user-role {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+    .btn-logout {
+      width: 100%;
+      padding: var(--space-2) var(--space-4);
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .btn-logout:hover {
+      border-color: var(--color-error);
+      color: var(--color-error);
+    }
+
+    /* ── 主内容区 ── */
+    .admin-main {
+      flex: 1;
+      margin-left: 240px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── 顶部工具栏 ── */
+    .admin-topbar {
+      height: 56px;
+      background: var(--color-surface-primary);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-8);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .topbar-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+    }
+    .topbar-breadcrumb span.sep { color: var(--color-border-strong); }
+    .topbar-breadcrumb .current { color: var(--color-text-primary); }
+    .topbar-actions { display: flex; align-items: center; gap: var(--space-3); }
+
+    /* ── 内容主体 ── */
+    .admin-content {
+      flex: 1;
+      padding: var(--space-8);
+    }
+
+    /* ── 统计卡片 ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+    .stat-card {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      animation: fadeSlideIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .stat-label {
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--color-text-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+    .stat-value {
+      font-family: var(--font-heading);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      line-height: 1;
+    }
+    .stat-value.accent { color: var(--color-accent); }
+    .stat-delta {
+      font-size: 11px;
+      color: var(--color-success);
+      margin-top: var(--space-1);
+      font-family: var(--font-body);
+    }
+
+    /* ── 过滤搜索工具栏 ── */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      max-width: 320px;
+      padding: var(--space-2) var(--space-4);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: var(--color-surface-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(45,106,79,0.10);
+    }
+    .filter-select {
+      padding: var(--space-2) var(--space-4);
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      background: var(--color-surface-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--color-accent); }
+
+    /* ── 文章表格 ── */
+    .table-wrapper {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .articles-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .articles-table thead {
+      background: var(--color-surface-secondary);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .articles-table th {
+      padding: var(--space-3) var(--space-5);
+      text-align: left;
+      font-size: 12px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .articles-table th.sortable { cursor: pointer; user-select: none; }
+    .articles-table th.sortable:hover { color: var(--color-text-primary); }
+    .articles-table td {
+      padding: var(--space-4) var(--space-5);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+    }
+    .articles-table tbody tr:last-child td { border-bottom: none; }
+    .articles-table tbody tr {
+      transition: background 0.15s;
+      animation: fadeSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .articles-table tbody tr:nth-child(1) { animation-delay: 0.5s; }
+    .articles-table tbody tr:nth-child(2) { animation-delay: 0.6s; }
+    .articles-table tbody tr:nth-child(3) { animation-delay: 0.65s; }
+    .articles-table tbody tr:nth-child(4) { animation-delay: 0.7s; }
+    .articles-table tbody tr:nth-child(5) { animation-delay: 0.75s; }
+    .articles-table tbody tr:hover { background: var(--color-surface-secondary); }
+
+    .article-title-cell { max-width: 300px; }
+    .article-title-link {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .article-title-link:hover { color: var(--color-accent); }
+    .article-excerpt {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 状态标签 */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-published {
+      background: rgba(39,174,96,0.1);
+      color: var(--color-success);
+    }
+    .status-draft {
+      background: rgba(230,126,34,0.1);
+      color: var(--color-warning);
+    }
+
+    /* 操作按钮 */
+    .action-btns {
+      display: flex;
+      gap: var(--space-2);
+      white-space: nowrap;
+    }
+    .btn-action {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-family: var(--font-body);
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-action-edit {
+      background: var(--color-accent-muted);
+      color: var(--color-accent);
+      border-color: rgba(45,106,79,0.2);
+    }
+    .btn-action-edit:hover {
+      background: var(--color-accent);
+      color: white;
+    }
+    .btn-action-delete {
+      background: rgba(192,57,43,0.08);
+      color: var(--color-error);
+      border-color: rgba(192,57,43,0.2);
+    }
+    .btn-action-delete:hover {
+      background: var(--color-error);
+      color: white;
+    }
+    .btn-action-preview {
+      background: var(--color-surface-overlay);
+      color: var(--color-text-secondary);
+      border-color: var(--color-border);
+    }
+    .btn-action-preview:hover {
+      border-color: var(--color-border-strong);
+      color: var(--color-text-primary);
+    }
+
+    /* ── 分页 ── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-top: 1px solid var(--color-border);
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+    }
+    .pagination-btns { display: flex; gap: var(--space-1); }
+    .page-btn {
+      min-width: 32px; height: 32px;
+      padding: 0 var(--space-2);
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .page-btn:hover, .page-btn.active {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: var(--color-accent-muted);
+    }
+    .page-btn.active { font-weight: 700; }
+
+    /* ── 删除确认弹窗 ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(28,28,28,0.4);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal-card {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      max-width: 380px;
+      width: 90%;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95) translateY(8px);
+      transition: transform 0.25s cubic-bezier(0.22,1,0.36,1);
+    }
+    .modal-overlay.show .modal-card { transform: scale(1) translateY(0); }
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .modal-body {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-6);
+    }
+    .modal-actions { display: flex; gap: var(--space-3); justify-content: flex-end; }
+    .btn-cancel {
+      padding: var(--space-2) var(--space-5);
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancel:hover { border-color: var(--color-border-strong); color: var(--color-text-primary); }
+    .btn-confirm-delete {
+      padding: var(--space-2) var(--space-5);
+      background: var(--color-error);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-confirm-delete:hover { opacity: 0.85; }
+
+    /* ── 响应式 ── */
+    @media (max-width: 1024px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); }
+      .admin-sidebar.open { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+      .admin-content { padding: var(--space-4); }
+      .stats-row { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+      .table-wrapper { overflow-x: auto; }
+      .articles-table { min-width: 700px; }
+    }
+
+    /* 暗色主题 */
+    [data-theme="dark"] .admin-topbar,
+    [data-theme="dark"] .table-wrapper,
+    [data-theme="dark"] .stat-card {
+      background: var(--color-surface-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <!-- ── 侧边栏 ── -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-brand">
+      <span class="logo-cn">墨迹后台</span>
+      <span class="logo-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">内容</div>
+      <a href="admin-articles.html" class="sidebar-nav-item active">
+        <span class="nav-icon">📄</span>
+        文章管理
+        <span class="nav-badge">12</span>
+      </a>
+      <a href="admin-edit.html" class="sidebar-nav-item">
+        <span class="nav-icon">✏️</span>
+        写新文章
+      </a>
+      <div class="sidebar-nav-section">账户</div>
+      <a href="#" class="sidebar-nav-item">
+        <span class="nav-icon">👤</span>
+        个人设置
+      </a>
+      <div class="sidebar-nav-section">站点</div>
+      <a href="index.html" target="_blank" class="sidebar-nav-item">
+        <span class="nav-icon">🌐</span>
+        查看博客
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div>
+          <div class="user-name">Admin</div>
+          <div class="user-role">超级管理员</div>
+        </div>
+        <button class="theme-toggle" onclick="ThemeManager.toggle()" style="margin-left:auto;" title="切换主题">
+          <span class="theme-icon">☾</span>
+        </button>
+      </div>
+      <button class="btn-logout" onclick="confirmLogout()">退出登录</button>
+    </div>
+  </aside>
+
+  <!-- ── 主内容 ── -->
+  <div class="admin-main">
+    <!-- 顶部工具栏 -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-4)">
+        <button class="hamburger" id="sidebarToggle" style="display:none;" aria-label="菜单">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span>后台</span>
+          <span class="sep">/</span>
+          <span class="current">文章管理</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <a href="admin-edit.html" class="btn-primary" style="font-size:13px;padding:6px 16px;">
+          + 写新文章
+        </a>
+      </div>
+    </header>
+
+    <!-- 内容区 -->
+    <main class="admin-content">
+
+      <!-- 统计卡片 -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">文章总数</div>
+          <div class="stat-value">12</div>
+          <div class="stat-delta">↑ 本月新增 3 篇</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已发布</div>
+          <div class="stat-value accent">8</div>
+          <div class="stat-delta">公开可见</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">草稿</div>
+          <div class="stat-value" style="color:var(--color-warning)">4</div>
+          <div class="stat-delta">待完成</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">本月访问</div>
+          <div class="stat-value">2.4k</div>
+          <div class="stat-delta">↑ 较上月 +18%</div>
+        </div>
+      </div>
+
+      <!-- 过滤工具栏 -->
+      <div class="table-toolbar">
+        <input
+          class="search-input"
+          type="search"
+          placeholder="搜索文章标题…"
+          oninput="filterArticles(this.value)"
+          aria-label="搜索文章"
+        >
+        <select class="filter-select" onchange="filterByStatus(this.value)">
+          <option value="all">全部状态</option>
+          <option value="published">已发布</option>
+          <option value="draft">草稿</option>
+        </select>
+        <select class="filter-select">
+          <option>全部分类</option>
+          <option>技术</option>
+          <option>生活</option>
+          <option>随笔</option>
+        </select>
+      </div>
+
+      <!-- 文章表格 -->
+      <div class="table-wrapper">
+        <table class="articles-table" id="articlesTable">
+          <thead>
+            <tr>
+              <th class="sortable" onclick="sortBy('title')">标题 ↕</th>
+              <th>状态</th>
+              <th>分类</th>
+              <th class="sortable" onclick="sortBy('date')">发布时间 ↕</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- JS 渲染 -->
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span class="pagination-info">共 <strong>12</strong> 篇文章，显示第 1-8 篇</span>
+          <div class="pagination-btns">
+            <button class="page-btn">←</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">→</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- 删除确认弹窗 -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-card">
+    <div class="modal-title">确认删除文章</div>
+    <div class="modal-body" id="deleteModalBody">
+      此操作不可撤销，文章将被永久删除。确定要继续吗？
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteModal()">取消</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<script src="components.js"></script>
+<script>
+  // ── 文章数据（原型演示用）
+  const articles = [
+    { id:1, title:'用 Node.js 构建博客系统的全过程',    excerpt:'记录从零搭建这个博客的技术历程…', status:'published', category:'技术', date:'2026-03-28' },
+    { id:2, title:'写给未来的自己：一封关于专注的信',     excerpt:'在信息爆炸的时代，如何找回专注力…',  status:'published', category:'随笔', date:'2026-03-20' },
+    { id:3, title:'MySQL 索引优化实战笔记',             excerpt:'记录生产环境中遭遇的慢查询和优化方案…', status:'published', category:'技术', date:'2026-03-15' },
+    { id:4, title:'阅读《置身事内》的几点感悟',           excerpt:'这本关于中国经济的书改变了我的…',      status:'published', category:'生活', date:'2026-03-08' },
+    { id:5, title:'EJS 模板引擎深度使用技巧',            excerpt:'总结在项目中积累的 EJS 使用经验…',    status:'draft',     category:'技术', date:'2026-03-01' },
+    { id:6, title:'2026 年的春天',                     excerpt:'窗外的玉兰开了，想到很多事情…',        status:'published', category:'生活', date:'2026-02-25' },
+    { id:7, title:'关于前端原生 CSS 的重新思考',          excerpt:'为什么这个项目决定不用框架…',          status:'draft',     category:'技术', date:'2026-02-18' },
+    { id:8, title:'阿里云 SAE 部署踩坑记录',            excerpt:'SAE 部署 Node.js 应用的完整流程…',    status:'published', category:'技术', date:'2026-02-10' },
+  ];
+
+  let deleteTargetId = null;
+  let currentFilter = { search:'', status:'all' };
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = data.map(a => `
+      <tr data-id="${a.id}">
+        <td class="article-title-cell">
+          <a href="admin-edit.html?id=${a.id}" class="article-title-link" title="${a.title}">${a.title}</a>
+          <div class="article-excerpt">${a.excerpt}</div>
+        </td>
+        <td>
+          <span class="status-badge ${a.status === 'published' ? 'status-published' : 'status-draft'}">
+            ${a.status === 'published' ? '已发布' : '草稿'}
+          </span>
+        </td>
+        <td style="color:var(--color-text-secondary);font-size:13px;">${a.category}</td>
+        <td style="color:var(--color-text-muted);font-size:13px;white-space:nowrap;">${a.date}</td>
+        <td>
+          <div class="action-btns">
+            <a href="admin-edit.html?id=${a.id}" class="btn-action btn-action-edit">编辑</a>
+            <a href="article.html" target="_blank" class="btn-action btn-action-preview">预览</a>
+            <button class="btn-action btn-action-delete" onclick="openDeleteModal(${a.id}, '${a.title.replace(/'/g,"\\'")}')">删除</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterArticles(search) {
+    currentFilter.search = search.toLowerCase();
+    applyFilter();
+  }
+  function filterByStatus(status) {
+    currentFilter.status = status;
+    applyFilter();
+  }
+  function applyFilter() {
+    let data = articles;
+    if (currentFilter.status !== 'all') data = data.filter(a => a.status === currentFilter.status);
+    if (currentFilter.search) data = data.filter(a => a.title.toLowerCase().includes(currentFilter.search));
+    renderTable(data);
+  }
+
+  function sortBy(field) {
+    const sorted = [...articles].sort((a,b) => {
+      if (field === 'title') return a.title.localeCompare(b.title, 'zh');
+      if (field === 'date') return b.date.localeCompare(a.date);
+      return 0;
+    });
+    renderTable(sorted);
+  }
+
+  function openDeleteModal(id, title) {
+    deleteTargetId = id;
+    document.getElementById('deleteModalBody').textContent = `确定要删除文章《${title}》吗？此操作不可撤销。`;
+    document.getElementById('deleteModal').classList.add('show');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('show');
+    deleteTargetId = null;
+  }
+  function confirmDelete() {
+    if (deleteTargetId) {
+      const row = document.querySelector(`tr[data-id="${deleteTargetId}"]`);
+      if (row) {
+        row.style.transition = 'opacity 0.3s, transform 0.3s';
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(20px)';
+        setTimeout(() => row.remove(), 300);
+      }
+    }
+    closeDeleteModal();
+  }
+
+  function confirmLogout() {
+    if (confirm('确定要退出登录吗？')) window.location.href = 'admin-login.html';
+  }
+
+  // 响应式侧边栏
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  if (window.innerWidth <= 768) sidebarToggle.style.display = 'flex';
+  sidebarToggle.addEventListener('click', () => {
+    document.getElementById('adminSidebar').classList.toggle('open');
+  });
+
+  // 初始渲染
+  renderTable(articles);
+</script>
+</body>
+</html>
